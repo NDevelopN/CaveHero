@@ -77,27 +77,8 @@ namespace Cave
             ChangeHP(val);
         }
 
-        public virtual bool AddItem(Item item)
-        {
-            string name = item.GetName();
-            if (Items.ContainsKey(name))
-            {
-                if (Items[name].AddUses(item.GetUses()))
-                {
-                    Console.WriteLine("Now have " + Items[name].GetUses() + " uses.");
-                }
-                else
-                {
-                    Console.WriteLine("Maximum uses " + Items[name].GetUses() + " in Inventory.");
-                }
-            }
-            else
-            {
-                Console.WriteLine("New item " + name + " added to Inventory.");
-                Items.Add(name, item);
-            }
-
-            return true;
+        public virtual void AddItem(Item item) {
+            Items.Add(item.GetName(), item);
         }
 
         public virtual Item[] GetItems()

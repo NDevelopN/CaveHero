@@ -63,7 +63,7 @@ namespace Cave
             {
                 string name = item.GetName();
                 Console.Write(Enemy.GetName() + " dropped " + name + ". ");
-                hero.AddItem(item);
+                hero.CollectItem(item);
             }
         }
     }
