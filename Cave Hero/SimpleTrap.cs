@@ -47,6 +47,8 @@ namespace Cave
                 Console.WriteLine("A trap tiggers and catches " + name + " off guard, dealing " + _dmg + " damage !");
                 hero.Damage(_dmg);
             }
+
+            Solved = true;
         }
     }
 }
