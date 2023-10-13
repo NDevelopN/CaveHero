@@ -78,11 +78,8 @@ namespace Cave
         {
             //TODO random decide direction too
             rooms = GenDir("Left", rooms);
-            Console.Write("rooms: " + rooms);
             rooms = GenDir("Straight", rooms);
-            Console.Write("rooms: " + rooms);
             rooms = GenDir("Right", rooms);
-            Console.Write("rooms: " + rooms);
 
             return rooms;
         }
