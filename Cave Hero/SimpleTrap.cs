@@ -1,17 +1,20 @@
 namespace Cave
 {
-    public class SimpleTrap : Encounter 
+    public class SimpleTrap : Encounter
     {
 
         int _dmg = 1;
-        int _spd = 1;
+        Die _spd;
 
-        public SimpleTrap() : base() { }
+        public SimpleTrap() : base()
+        {
+            _spd = new Die(1);
+        }
 
         public SimpleTrap(int dmg, int spd)
         {
             _dmg = dmg;
-            _spd = spd;
+            _spd = new Die(spd);
         }
 
         public void SetDmg(int dmg)
@@ -21,18 +24,23 @@ namespace Cave
 
         public void SetSpd(int spd)
         {
-            _spd = spd;
+            _spd.SetSides(spd);
         }
 
         public override void Trigger(Hero hero)
         {
             if (Solved) { NoDanger(hero); return; }
 
+            Console.Write("A Trap!");
+
             string name = hero.GetName();
 
-            if (hero.GetSpd() >= _spd)
+            int hSpd = hero.RollSpd(1);
+            int tSpd = _spd.Roll(1, false);
+
+            if (hSpd >= tSpd)
             {
-                Console.WriteLine("A trap (" + _spd + ") triggers, but " + name + " (" + hero.GetSpd() + ") manages to quickly evade it!");
+                Console.WriteLine(" It triggers (" + tSpd + ") , but " + name + " (" + hSpd + ") manages to quickly evade it!");
             }
             else
             {

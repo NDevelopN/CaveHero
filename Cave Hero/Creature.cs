@@ -6,16 +6,19 @@ namespace Cave
         protected string Name = "";
         protected int Hp = 0;
         protected int Atk = 0;
-        protected int Spd = 0;
+        protected Die Spd;
 
-        protected Creature() { }
+        protected Creature()
+        {
+            Spd = new Die(1);
+        }
 
         public Creature(string name, int hp, int atk, int spd)
         {
             Name = name;
             Hp = hp;
             Atk = atk;
-            Spd = spd;
+            Spd = new Die(spd);
         }
 
         public Status GetStatus()
@@ -38,9 +41,15 @@ namespace Cave
             return Atk;
         }
 
-        public int GetSpd()
+        public Die GetSpd()
         {
             return Spd;
+        }
+
+        public int RollSpd(int count)
+        {
+            Console.WriteLine(Name + " rolls for Spd.");
+            return Spd.Roll(count, true);
         }
 
         public virtual string PrintStats()

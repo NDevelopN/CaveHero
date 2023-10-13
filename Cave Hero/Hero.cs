@@ -7,7 +7,7 @@ namespace Cave
             Name = "Hero";
             Hp = 3;
             Atk = 1;
-            Spd = 2;
+            Spd = new Die(4);
         }
     }
 }

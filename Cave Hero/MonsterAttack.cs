@@ -1,3 +1,5 @@
+using System.Runtime.InteropServices;
+
 namespace Cave
 {
     public class MonsterAttack : Encounter 
@@ -9,7 +11,7 @@ namespace Cave
             Random rnd = new();
             int hp = rnd.Next(1, 3);
             int atk = 1;
-            int spd = rnd.Next(0, 4);
+            int spd = rnd.Next(1, 5);
 
             int lvl = hp + atk + spd;
 
@@ -28,24 +30,25 @@ namespace Cave
             Console.WriteLine("Ahh! An enemy attacks!");
             Console.WriteLine(_enemy.PrintStats());
 
-            Creature first = (_enemy.GetSpd() > hero.GetSpd()) ? _enemy : hero;
-            Creature second = (first == _enemy) ? hero : _enemy;
+            Combat(hero);
+            Solved = true;
+        }
 
-            Console.WriteLine(first.GetName() + " goes first!");
-
-            int fAtk = first.GetAtk();
-            int sAtk = second.GetAtk();
-
-            while (first.GetStatus() != Status.DEAD && second.GetStatus() != Status.DEAD)
+        protected void Combat(Hero hero) {
+            int round = 1;
+            while (hero.GetStatus() != Status.DEAD && _enemy.GetStatus() != Status.DEAD)
             {
-                second.Damage(fAtk);
+                Console.Write("Round " + round + ": ");
+                Creature first = (_enemy.RollSpd(1) > hero.RollSpd(1)) ? _enemy : hero;
+                Console.WriteLine(first.GetName() + " goes first!");
+                Creature second = (first == _enemy) ? hero : _enemy;
+
+                second.Damage(first.GetAtk());
                 if (second.GetStatus() != Status.DEAD)
                 {
-                    first.Damage(sAtk);
+                    first.Damage(second.GetAtk());
                 }
             }
-
-            Solved = true;
         }
     }
 }
