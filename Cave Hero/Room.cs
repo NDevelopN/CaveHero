@@ -2,13 +2,14 @@ namespace Cave
 {
     public class Room
     {
+        private bool _captorFlag = false;
+
         protected Dictionary<string, Room> Paths;
         protected Encounter Enc;
 
         protected Room()
         {
-            Paths = new Dictionary<string, Room>();
-            Enc = new Encounter();
+            Paths = new Dictionary<string, Room>(); Enc = new Encounter();
         }
 
         public Room(Room last, Encounter e)
@@ -98,7 +99,7 @@ namespace Cave
             {
                 rooms--;
                 //TODO more robust event generation/room selection
-                Encounter nEnc = (rnd.Next(0, 2) == 1) ? new MonsterAttack() : new SimpleTrap();
+                Encounter nEnc = (rnd.Next(0, 2) == 1) ? Atk(rnd) : new SimpleTrap();
                 Room nRoom = new(this, nEnc);
 
                 Paths.Add(dir, nRoom);
@@ -106,6 +107,19 @@ namespace Cave
             }
 
             return rooms;
+        }
+
+        private Encounter Atk(Random rnd)
+        {
+            if (_captorFlag)
+            {
+                return new MonsterAttack();
+            }
+
+            //TODO improve this
+            Creature captive = new("Sibling", 2, 0, 2);
+            _captorFlag = true;
+            return (rnd.Next(0, 2) == 1) ? new MonsterAttack() : new CaptorAttack(captive);
         }
     }
 }

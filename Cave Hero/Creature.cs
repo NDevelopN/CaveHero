@@ -30,6 +30,11 @@ namespace Cave
             return Status;
         }
 
+        public void SetStatus(Status status)
+        {
+            Status = status;
+        }
+
         public string GetName()
         {
             return Name;

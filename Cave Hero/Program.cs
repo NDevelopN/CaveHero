@@ -7,6 +7,8 @@ namespace Cave
             Hero hero = new();
 
             Console.WriteLine("Welcome to the Cave!");
+            Console.WriteLine("Nasty monsters took your sibling into this Cave.");
+            Console.WriteLine("You must hurry to save them, before it's too late!");
 
             Entrance ent = new();
             Exit exit = new();
@@ -15,7 +17,7 @@ namespace Cave
             ent.GenPaths(5);
 
             Room? curRoom = ent;
-            while (hero.GetStatus() != Status.DEAD)
+            while (hero.GetStatus() != Status.DEAD && hero.GetStatus() != Status.WIN)
             {
                 curRoom = curRoom.ChoosePath();
                 if (curRoom == null)
@@ -27,9 +29,11 @@ namespace Cave
                 enc.Trigger(hero);
             }
 
+            string endMsg = (hero.GetStatus() == Status.WIN) ? "Congratulations, Cave Hero!" : "Too bad, you lose!";
+
             Thread.Sleep(1000);
-            Console.WriteLine("Too bad, you lose!");
+            Console.WriteLine(endMsg);
             Thread.Sleep(1000);
         }
     }
-} 
+}

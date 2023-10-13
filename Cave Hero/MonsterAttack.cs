@@ -2,7 +2,7 @@ namespace Cave
 {
     public class MonsterAttack : Encounter
     {
-        private Creature _enemy;
+        protected Creature Enemy;
 
         public MonsterAttack() : base()
         {
@@ -13,13 +13,13 @@ namespace Cave
 
             int lvl = hp + atk + spd;
 
-            _enemy = new Creature("Monster[" + lvl + "]", hp, atk, spd);
-            _enemy.AddItem(new Potion(6, 1));
+            Enemy = new Creature("Monster[" + lvl + "]", hp, atk, spd);
+            Enemy.AddItem(new Potion(6, 1));
         }
 
         public MonsterAttack(Creature enemy) : base()
         {
-            _enemy = enemy;
+            Enemy = enemy;
         }
 
         public override void Trigger(Hero hero)
@@ -27,38 +27,43 @@ namespace Cave
             if (Solved) { NoDanger(hero); return; }
 
             Console.WriteLine("Ahh! An enemy attacks!");
-            Console.WriteLine(_enemy.PrintStats());
+            Console.WriteLine(Enemy.PrintStats());
 
             Combat(hero);
             Solved = true;
         }
 
-        protected void Combat(Hero hero)
+        protected virtual void Combat(Hero hero)
         {
             int round = 1;
             while (hero.GetStatus() != Status.DEAD)
             {
-                if (_enemy.GetStatus() != Status.DEAD)
+                if (Enemy.GetStatus() != Status.DEAD)
                 {
-                    foreach (Item item in _enemy.GetItems())
-                    {
-                        string name = item.GetName();
-                        Console.Write(_enemy.GetName() + " dropped " + name + ". ");
-                        hero.AddItem(item);
-                    }
+                    Reward(hero);
                     break;
                 }
 
                 Console.Write("Round " + round + ": ");
-                Creature first = (_enemy.RollSpd(1) > hero.RollSpd(1)) ? _enemy : hero;
+                Creature first = (Enemy.RollSpd(1) > hero.RollSpd(1)) ? Enemy : hero;
                 Console.WriteLine(first.GetName() + " goes first!");
-                Creature second = (first == _enemy) ? hero : _enemy;
+                Creature second = (first == Enemy) ? hero : Enemy;
 
                 second.Damage(first.GetAtk());
                 if (second.GetStatus() != Status.DEAD)
                 {
                     first.Damage(second.GetAtk());
                 }
+            }
+        }
+
+        protected virtual void Reward(Hero hero)
+        {
+            foreach (Item item in Enemy.GetItems())
+            {
+                string name = item.GetName();
+                Console.Write(Enemy.GetName() + " dropped " + name + ". ");
+                hero.AddItem(item);
             }
         }
     }
