@@ -8,9 +8,12 @@ namespace Cave
         protected int Atk = 0;
         protected Die Spd;
 
+        protected Dictionary<string, Item> Items;
+
         protected Creature()
         {
             Spd = new Die(1);
+            Items = new Dictionary<string, Item>();
         }
 
         public Creature(string name, int hp, int atk, int spd)
@@ -19,6 +22,7 @@ namespace Cave
             Hp = hp;
             Atk = atk;
             Spd = new Die(spd);
+            Items = new Dictionary<string, Item>();
         }
 
         public Status GetStatus()
@@ -66,6 +70,44 @@ namespace Cave
         public virtual void Heal(int val)
         {
             ChangeHP(val);
+        }
+
+        public virtual bool AddItem(Item item)
+        {
+            string name = item.GetName();
+            if (Items.ContainsKey(name))
+            {
+                if (Items[name].AddUses(item.GetUses()))
+                {
+                    Console.WriteLine("Now have " + Items[name].GetUses() + " uses.");
+                }
+                else
+                {
+                    Console.WriteLine("Maximum uses " + Items[name].GetUses() + " in Inventory.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("New item " + name + " added to Inventory.");
+                Items.Add(name, item);
+            }
+
+            return true;
+        }
+
+        public virtual Item[] GetItems()
+        {
+            return Items.Values.ToArray();
+        }
+
+        public virtual int GetItemCount(string name)
+        {
+            if (!Items.ContainsKey(name))
+            {
+                return 0;
+            }
+
+            return Items[name].GetUses();
         }
 
         protected virtual void ChangeHP(int val)

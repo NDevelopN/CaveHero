@@ -1,8 +1,6 @@
-using System.Runtime.InteropServices;
-
 namespace Cave
 {
-    public class MonsterAttack : Encounter 
+    public class MonsterAttack : Encounter
     {
         private Creature _enemy;
 
@@ -16,6 +14,7 @@ namespace Cave
             int lvl = hp + atk + spd;
 
             _enemy = new Creature("Monster[" + lvl + "]", hp, atk, spd);
+            _enemy.AddItem(new Potion(6, 1));
         }
 
         public MonsterAttack(Creature enemy) : base()
@@ -34,10 +33,22 @@ namespace Cave
             Solved = true;
         }
 
-        protected void Combat(Hero hero) {
+        protected void Combat(Hero hero)
+        {
             int round = 1;
-            while (hero.GetStatus() != Status.DEAD && _enemy.GetStatus() != Status.DEAD)
+            while (hero.GetStatus() != Status.DEAD)
             {
+                if (_enemy.GetStatus() != Status.DEAD)
+                {
+                    foreach (Item item in _enemy.GetItems())
+                    {
+                        string name = item.GetName();
+                        Console.Write(_enemy.GetName() + " dropped " + name + ". ");
+                        hero.AddItem(item);
+                    }
+                    break;
+                }
+
                 Console.Write("Round " + round + ": ");
                 Creature first = (_enemy.RollSpd(1) > hero.RollSpd(1)) ? _enemy : hero;
                 Console.WriteLine(first.GetName() + " goes first!");
