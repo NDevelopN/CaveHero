@@ -75,7 +75,6 @@ namespace Cave
 
         public int GenPaths(int rooms)
         {
-            Console.Write("Creating new paths (" + rooms + ")");
             //TODO random decide direction too
             rooms = GenDir("Left", rooms);
             Console.Write("rooms: " + rooms);
