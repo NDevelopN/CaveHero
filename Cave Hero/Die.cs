@@ -14,6 +14,10 @@ namespace Cave
             _sides = sides;
         }
 
+        public int GetSides() {
+            return _sides;
+        }
+
         public int Roll(int count, bool print)
         {
             Random rnd = new();

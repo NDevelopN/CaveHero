@@ -64,7 +64,7 @@ namespace Cave
         public virtual string PrintStats()
         {
             return string.Format("_{0}_\nhp: {1}\natk:{2}\nspd: {3}",
-                    Name, Hp, Atk, Spd);
+                    Name, Hp, Atk, Spd.GetSides());
         }
 
         public virtual void Damage(int val)
