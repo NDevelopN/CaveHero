@@ -10,11 +10,13 @@ namespace Cave
             Console.WriteLine("Nasty monsters took your sibling into this Cave.");
             Console.WriteLine("You must hurry to save them, before it's too late!");
 
-            Entrance ent = new();
-            Exit exit = new();
-            ent.AddPath("Escape", exit);
+            Cave cave = new(6, 6, 12);
+            Entrance? ent = cave.Generate();
+            if (ent == null) {
+                Console.WriteLine("Entrance returned was null");
+                Environment.Exit(1);
 
-            ent.GenPaths(5);
+            }
 
             Room? curRoom = ent;
             while (hero.GetStatus() != Status.DEAD && hero.GetStatus() != Status.WIN)

@@ -1,0 +1,267 @@
+using System.Reflection.Metadata.Ecma335;
+using System.Xml.Schema;
+
+namespace Cave
+{
+
+    public class Cave
+    {
+        protected struct Coord
+        {
+            public int X;
+            public int Y;
+
+            public Coord(int x, int y)
+            {
+                X = x;
+                Y = y;
+            }
+
+            public override string ToString()
+            {
+                return "(" + X + "," + Y + ")";
+            }
+        }
+
+        private Dictionary<Coord, Room> _grid;
+        private Entrance? _entrance;
+
+        private int _PATHMOD = 10;
+
+        protected int MaxX, MaxY;
+        protected int Size;
+
+        public Cave(int x, int y, int size)
+        {
+            _grid = new Dictionary<Coord, Room>();
+            MaxX = x;
+            MaxY = y;
+
+            Size = size;
+        }
+
+        public Entrance? Generate()
+        {
+            Stack<Coord> stack = new();
+
+            int roomCount = 0;
+            Coord curLoc = SelectEntrance();
+
+            stack.Push(curLoc);
+
+            while (stack.Count > 0)
+            {
+                curLoc = stack.Pop();
+                Console.WriteLine("Coord: " + curLoc.ToString());
+
+                Room room = _grid[curLoc];
+                int pCount = room.GetPCount();
+
+                //While all 4 paths have not been accounted for, and while there are more rooms to add
+                while (pCount < 4 && roomCount < Size)
+                {
+                    Console.WriteLine("PCount: " + pCount);
+
+                    Random rnd = new();
+                    int res = rnd.Next(0, 100);
+                    int rChance = RoomChance(room.GetPCount(), roomCount);
+                    if (res > rChance)
+                    {
+                        Console.WriteLine("Failed chance (" + res + "/" + rChance + ")");
+                        pCount++;
+                        continue;
+                    }
+
+                    Coord nextLoc = ContinuePath(curLoc);
+                    Console.WriteLine("Next Coord: " + nextLoc.ToString());
+
+                    if (nextLoc.Equals(curLoc))
+                    {
+                        Console.WriteLine("Same as current, invalid pathway.");
+                        continue;
+                    }
+
+                    Room nRoom;
+
+                    if (_grid.ContainsKey(nextLoc))
+                    {
+                        nRoom = _grid[nextLoc];
+                        pCount++;
+                        Console.WriteLine("Existing room, no generation");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Next space is open...");
+
+                        Console.WriteLine("New room generation");
+
+                        roomCount++;
+
+                        nRoom = new Room();
+                        _grid.Add(nextLoc, nRoom);
+
+                        stack.Push(nextLoc);
+                    }
+
+                    if (curLoc.X == nextLoc.X)
+                    {
+                        if (curLoc.Y < nextLoc.Y)
+                        {
+                            room.AddPath(Dir.NORTH, nRoom);
+                            nRoom.AddPath(Dir.SOUTH, room);
+                        }
+                        else
+                        {
+                            room.AddPath(Dir.SOUTH, nRoom);
+                            nRoom.AddPath(Dir.NORTH, room);
+                        }
+                    }
+                    else
+                    {
+                        if (curLoc.X > nextLoc.X)
+                        {
+                            room.AddPath(Dir.WEST, nRoom);
+                            nRoom.AddPath(Dir.EAST, room);
+                        }
+                        else
+                        {
+                            room.AddPath(Dir.EAST, nRoom);
+                            nRoom.AddPath(Dir.WEST, room);
+                        }
+                    }
+
+                    pCount++;
+                    continue;
+                }
+            }
+
+            if (roomCount < Size)
+            {
+                Console.WriteLine("Did not generate all intended rooms: " + roomCount + "/" + Size);
+            }
+
+            return _entrance;
+        }
+
+        protected Coord SelectEntrance()
+        {
+            Entrance ent = new();
+            Exit ex = new();
+
+            int x, y;
+            Coord entCoord, exCoord;
+
+            Random rnd = new();
+            Dir dir = (Dir)rnd.Next(0, 4);
+            switch (dir)
+            {
+                case Dir.WEST:
+                    x = 0;
+                    y = rnd.Next(0, MaxY + 1);
+                    entCoord = new Coord(x, y);
+                    exCoord = new Coord(-1, y);
+                    break;
+                case Dir.NORTH:
+                    x = rnd.Next(0, MaxX + 1);
+                    y = 0;
+                    entCoord = new Coord(x, y);
+                    exCoord = new Coord(x, 1);
+                    break;
+                case Dir.EAST:
+                    x = MaxX;
+                    y = rnd.Next(0, MaxY + 1);
+                    entCoord = new Coord(x, y);
+                    exCoord = new Coord(x + 1, y);
+                    break;
+                case Dir.SOUTH:
+                    x = rnd.Next(0, MaxX + 1);
+                    y = MaxY;
+                    entCoord = new Coord(x, y);
+                    exCoord = new Coord(x, y + 1);
+                    break;
+                default:
+                    Console.WriteLine("[ERROR] Invalid starting direction: " + dir);
+                    x = 0;
+                    y = rnd.Next(0, MaxY + 1);
+                    entCoord = new Coord(x, y);
+                    exCoord = new Coord(-1, y);
+                    break;
+            }
+
+            ent.AddPath(dir, ex);
+
+            _grid.Add(entCoord, ent);
+            _grid.Add(exCoord, ex);
+
+            _entrance = ent;
+
+            return entCoord;
+        }
+
+        protected Coord ContinuePath(Coord curLoc)
+        {
+            Random rnd = new();
+
+            int res = rnd.Next(0, 4);
+
+            Coord nextCoord;
+            switch (res)
+            {
+                case 0:
+                    //West
+                    if (curLoc.X <= 0)
+                    {
+                        return curLoc; }
+                    nextCoord = new Coord(curLoc.X - 1, curLoc.Y);
+                    break;
+                case 1:
+                    //North
+                    if (curLoc.Y >= MaxY)
+                    {
+                        return curLoc;
+                    }
+                    nextCoord = new Coord(curLoc.X, curLoc.Y + 1);
+                    break;
+                case 2:
+                    //East
+                    if (curLoc.X >= MaxX)
+                    {
+                        return curLoc;
+                    }
+                    nextCoord = new Coord(curLoc.X + 1, curLoc.Y);
+                    break;
+                case 3:
+                    //South
+                    if (curLoc.Y <= 0)
+                    {
+                        return curLoc;
+                    }
+                    nextCoord = new Coord(curLoc.X, curLoc.Y - 1);
+                    break;
+                default:
+                    Console.WriteLine("Invalid direction: " + res);
+                    nextCoord = curLoc;
+                    break;
+            }
+
+            return nextCoord;
+        }
+
+        /**
+         *  Generate a probability of creating a new room given
+         *      -The number of existing paths from the current room
+         *      -The percentage of rooms yet to be created 
+         *  The result should be higher chances for early rooms and rooms with fewer paths
+        **/
+        protected int RoomChance(int pCount, int roomCount)
+        {
+            int chance = 70;
+            int pChance = _PATHMOD * pCount;
+            int rChance = (int)(decimal.Divide(Size - roomCount, Size) * 50);
+
+            int total = chance - pChance + rChance;
+
+            return total;
+        }
+    }
+}

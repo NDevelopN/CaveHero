@@ -6,4 +6,11 @@ namespace Cave
         WIN,
         DEAD
     }
+
+    public enum Dir {
+        WEST,
+        NORTH,
+        EAST,
+        SOUTH
+    }
 }

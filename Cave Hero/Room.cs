@@ -2,31 +2,122 @@ namespace Cave
 {
     public class Room
     {
-        private bool _captorFlag = false;
-
-        protected Dictionary<string, Room> Paths;
-        protected Encounter Enc;
-
-        protected Room()
+        protected struct RoomPaths
         {
-            Paths = new Dictionary<string, Room>(); Enc = new Encounter();
-        }
+            private Dictionary<Dir, Room?> _paths;
+            private int _pCount;
 
-        public Room(Room last, Encounter e)
-        {
-            Paths = new Dictionary<string, Room>() { { "Back", last } };
-            Enc = e;
-        }
-
-        public bool AddPath(string dir, Room room)
-        {
-            if (Paths.ContainsKey(dir))
+            public RoomPaths()
             {
-                return false;
+                _paths = new Dictionary<Dir, Room?> {
+                    {Dir.WEST, null},
+                    {Dir.NORTH, null},
+                    {Dir.EAST, null},
+                    {Dir.SOUTH, null}
+                };
+
+                _pCount = 0;
             }
 
-            Paths.Add(dir, room);
-            return true;
+            public bool SetPath(Dir dir, Room room)
+            {
+                if (_paths[dir] != null)
+                {
+                    return false;
+                }
+
+                _paths[dir] = room;
+                _pCount++;
+                return true;
+            }
+
+            public Room? GetPath(Dir dir)
+            {
+                return _paths[dir];
+            }
+
+            public Room? GetExit()
+            {
+                foreach (KeyValuePair<Dir, Room?> path in _paths)
+                {
+                    if (path.Value is Exit)
+                    {
+                        return path.Value;
+                    }
+                }
+
+                return null;
+            }
+
+            public string PrintOut()
+            {
+                string options = "Paths: ";
+
+                foreach (KeyValuePair<Dir, Room?> path in _paths)
+                {
+                    if (path.Value == null)
+                    {
+                        continue;
+                    }
+
+                    if (path.Value is Exit)
+                    {
+                        options += "[ESCAPE] ";
+                    }
+                    else
+                    {
+                        options += "[" + path.Key.ToString() + "] ";
+                    }
+                }
+
+                options += "\n";
+
+                return options;
+            }
+
+            public int GetPCount()
+            {
+                return _pCount;
+            }
+        }
+
+        private string _name;
+
+        private bool _captorFlag = false;
+
+        protected RoomPaths Paths;
+        protected Encounter Enc;
+
+        public Room()
+        {
+            Paths = new(); ;
+            Enc = new Encounter();
+            _name = MakeName();
+        }
+
+//TODO remove this
+        private string MakeName() {
+            Random rnd = new();
+            int res = rnd.Next(1000, 9999);
+            return "Room [" + res +"]";
+
+        }
+        
+        public string GetName() {
+            return _name;
+        }
+
+        public void AddPath(Dir dir, Room room) {
+            if (!Paths.SetPath(dir, room)) {
+                Console.WriteLine("Attempted to create room where there was already a path.");
+            } else {
+                Console.WriteLine("Added " + room.GetName() + " to " + dir.ToString() + " of " + _name);
+            }
+        }
+
+        public int GetPCount()
+        {
+            return Paths.GetPCount();
         }
 
         public virtual Encounter Enter()
@@ -38,23 +129,29 @@ namespace Cave
         {
             try
             {
+                Console.WriteLine("You are in " + _name);
                 Console.WriteLine("Where to next?");
                 while (true)
                 {
                     //TODO universal text entry
-                    OfferPaths();
+                    Console.Write(Paths.PrintOut());
                     string? dir = Console.ReadLine();
-                    if (dir != null)
-                    {
-                        if (Paths.ContainsKey(dir))
-                        {
-                            return Paths[dir];
-                        }
-                        else
-                        {
-                            Console.Write("'" + dir + "' is not a valid option.");
-                        }
+                    if (dir == null) {
+                        Console.WriteLine("No input received.");
+                        continue;
                     }
+
+                    dir = dir.ToUpper();
+
+                    return dir switch
+                    {
+                        "WEST" => Paths.GetPath(Dir.WEST),
+                        "NORTH" => Paths.GetPath(Dir.NORTH),
+                        "EAST" => Paths.GetPath(Dir.EAST),
+                        "SOUTH" => Paths.GetPath(Dir.SOUTH),
+                        "ESCAPE" => Paths.GetExit(),
+                        _ => null,
+                    };
                 }
             }
             catch (IOException e)
@@ -63,60 +160,6 @@ namespace Cave
                 errorWriter.WriteLine(e.Message);
                 return null;
             }
-        }
-
-        private void OfferPaths()
-        {
-            foreach (KeyValuePair<string, Room> path in Paths)
-            {
-                Console.Write("[" + path.Key + "] ");
-            }
-            Console.WriteLine();
-        }
-
-        public int GenPaths(int rooms)
-        {
-            //TODO random decide direction too
-            rooms = GenDir("Left", rooms);
-            rooms = GenDir("Straight", rooms);
-            rooms = GenDir("Right", rooms);
-
-            return rooms;
-        }
-
-        private int GenDir(string dir, int rooms)
-        {
-            if (Paths.ContainsKey(dir) || rooms <= 0)
-            {
-                return rooms;
-            }
-
-            Random rnd = new();
-            if (rnd.Next(0, 4) > 1)
-            {
-                rooms--;
-                //TODO more robust event generation/room selection
-                Encounter nEnc = (rnd.Next(0, 2) == 1) ? Atk(rnd) : new SimpleTrap();
-                Room nRoom = new(this, nEnc);
-
-                Paths.Add(dir, nRoom);
-                return nRoom.GenPaths(rooms);
-            }
-
-            return rooms;
-        }
-
-        private Encounter Atk(Random rnd)
-        {
-            if (_captorFlag)
-            {
-                return new MonsterAttack();
-            }
-
-            //TODO improve this
-            Creature captive = new("Sibling", 2, 0, 2);
-            _captorFlag = true;
-            return (rnd.Next(0, 2) == 1) ? new MonsterAttack() : new CaptorAttack(captive);
         }
     }
 }
