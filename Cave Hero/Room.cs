@@ -9,9 +9,15 @@ namespace Cave
 
         public Room()
         {
-            Paths = new(); ;
+            Paths = new();
             Features = new List<IFeature>();
             _name = MakeName();
+        }
+
+        public Room(string name) {
+            _name = name;
+            Paths = new();
+            Features = new List<IFeature>();
         }
 
         //TODO remove this

@@ -38,7 +38,7 @@ namespace Cave
         {
             foreach (KeyValuePair<Dir, Room?> path in _paths)
             {
-                if (path.Value is Exit)
+                if (path.Value != null && path.Value.GetName() == "EXIT")
                 {
                     return path.Value;
                 }
@@ -58,7 +58,7 @@ namespace Cave
                     continue;
                 }
 
-                if (path.Value is Exit)
+                if (path.Value.GetName() == "EXIT")
                 {
                     options += "[ESCAPE] ";
                 }

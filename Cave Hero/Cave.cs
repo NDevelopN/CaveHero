@@ -23,7 +23,7 @@ namespace Cave
         private RoomBuilder _builder;
 
         private Dictionary<Coord, Room> _grid;
-        private Entrance? _entrance;
+        private Room? _entrance;
 
         private int _PATHMOD = 10;
 
@@ -41,7 +41,7 @@ namespace Cave
             _builder = new RoomBuilder();
         }
 
-        public Entrance? Generate()
+        public Room? Generate()
         {
             Stack<Coord> stack = new();
 
@@ -146,11 +146,8 @@ namespace Cave
 
         protected Coord SelectEntrance()
         {
-            Entrance ent = new();
-            Exit ex = new();
-
             int x, y;
-            Coord entCoord, exCoord;
+            Coord entCoord;
 
             Random rnd = new();
             Dir dir = (Dir)rnd.Next(0, 4);
@@ -160,41 +157,32 @@ namespace Cave
                     x = 0;
                     y = rnd.Next(0, MaxY + 1);
                     entCoord = new Coord(x, y);
-                    exCoord = new Coord(-1, y);
                     break;
                 case Dir.NORTH:
                     x = rnd.Next(0, MaxX + 1);
                     y = 0;
                     entCoord = new Coord(x, y);
-                    exCoord = new Coord(x, 1);
                     break;
                 case Dir.EAST:
                     x = MaxX;
                     y = rnd.Next(0, MaxY + 1);
                     entCoord = new Coord(x, y);
-                    exCoord = new Coord(x + 1, y);
                     break;
                 case Dir.SOUTH:
                     x = rnd.Next(0, MaxX + 1);
                     y = MaxY;
                     entCoord = new Coord(x, y);
-                    exCoord = new Coord(x, y + 1);
                     break;
                 default:
                     Console.WriteLine("[ERROR] Invalid starting direction: " + dir);
                     x = 0;
                     y = rnd.Next(0, MaxY + 1);
                     entCoord = new Coord(x, y);
-                    exCoord = new Coord(-1, y);
                     break;
             }
 
-            ent.AddPath(dir, ex);
-
-            _grid.Add(entCoord, ent);
-            _grid.Add(exCoord, ex);
-
-            _entrance = ent;
+            _entrance = _builder.CreateEntrance(dir);
+            _grid.Add(entCoord, _entrance);
 
             return entCoord;
         }

@@ -11,11 +11,10 @@ namespace Cave
             Console.WriteLine("You must hurry to save them, before it's too late!");
 
             Cave cave = new(6, 6, 12);
-            Entrance? ent = cave.Generate();
+            Room? ent = cave.Generate();
             if (ent == null) {
                 Console.WriteLine("Entrance returned was null");
                 Environment.Exit(1);
-
             }
 
             Room? curRoom = ent;
