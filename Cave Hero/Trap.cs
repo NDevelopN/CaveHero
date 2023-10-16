@@ -35,7 +35,7 @@ namespace Cave {
 
 
         protected void Spring(List<Creature> party) {
-            int c = _count.Roll(1, false);
+            int c = _count.Roll();
             int o = party.Count;
             if (c > o) {
                 c = o;
@@ -56,7 +56,7 @@ namespace Cave {
             string name = target.GetName();
 
             int tSpd = target.RollSpd(1);
-            int dSpd = _spd.Roll(1, false);
+            int dSpd = _spd.Roll();
 
             if (tSpd >= dSpd)
             {
@@ -64,7 +64,7 @@ namespace Cave {
             }
             else
             {
-                int damage = _dmg.Roll(1, false);
+                int damage = _dmg.Roll();
                 Console.WriteLine("A trap tiggers and catches " + name + " off guard, dealing " + damage + " damage !");
                 target.Damage(damage);
             }

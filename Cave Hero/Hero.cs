@@ -11,8 +11,8 @@ namespace Cave
             Name = "Hero";
             Hp = 3;
             Atk = 1;
-            Spd = new Die(4);
-            Items = new Dictionary<string, Item>() { { "Potion", new Potion(6, 1) } };
+            Spd = new Die(4, 1);
+            Items = new Dictionary<string, Item>() { { "Potion", new Potion(6, 1, 1) } };
             _party = new List<Creature> { this };
         }
 
@@ -104,7 +104,7 @@ namespace Cave
                 Creature target = _party[i];
 
                 //TODO add some stance mechanic to change how this works
-                if (Spd.Roll(1, false) < target.RollSpd(1))
+                if (Spd.Roll() < target.RollSpd(1))
                 {
                     target.Damage(val);
                     if (target.GetHP() < 2)

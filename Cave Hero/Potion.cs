@@ -2,18 +2,18 @@ namespace Cave
 {
     public class Potion : Item
     {
-        private Die _hp;
+        private Die _die;
         private int _maxUses = 3;
 
-        public Potion(int hp, int uses) : base("Potion", uses)
+        public Potion(int size, int count, int uses) : base("Potion", uses)
         {
-            _hp = new Die(hp);
+            _die = new Die(size, count);
         }
 
         public override void Use(Creature target)
         {
             Use();
-            target.Heal(_hp.Roll(1, true));
+            target.Heal(_die.Roll());
         }
 
         public override bool AddUses(int uses)

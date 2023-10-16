@@ -12,7 +12,7 @@ namespace Cave
 
         protected Creature()
         {
-            Spd = new Die(1);
+            Spd = new Die(1, 1);
             Items = new Dictionary<string, Item>();
         }
 
@@ -21,7 +21,7 @@ namespace Cave
             Name = name;
             Hp = hp;
             Atk = atk;
-            Spd = new Die(spd);
+            Spd = new Die(spd, 1);
             Items = new Dictionary<string, Item>();
         }
 
@@ -58,7 +58,7 @@ namespace Cave
         public int RollSpd(int count)
         {
             Console.WriteLine(Name + " rolls for Spd.");
-            return Spd.Roll(count, true);
+            return Spd.Roll();
         }
 
         public virtual string PrintStats()
