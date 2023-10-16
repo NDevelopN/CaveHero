@@ -27,10 +27,9 @@ namespace Cave
                     return;
                 }
 
-                Encounter enc = curRoom.Enter();
-                enc.Trigger(hero);
+                curRoom.Enter(hero);
             }
-
+            
             string endMsg = (hero.GetStatus() == Status.WIN) ? "Congratulations, Cave Hero!" : "Too bad, you lose!";
 
             Thread.Sleep(1000);

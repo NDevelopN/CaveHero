@@ -1,8 +1,10 @@
 namespace Cave
 {
+
+    //TODO remove
     public class Exit : Room
     {
-        public override Encounter Enter()
+        public Encounter Enter()
         {
             return new Escape();
         }

@@ -5,31 +5,36 @@ namespace Cave
         private string _name;
 
         protected Pathways Paths;
-        protected Encounter Enc;
+        protected List<IFeature> Features;
 
         public Room()
         {
             Paths = new(); ;
-            Enc = new Encounter();
+            Features = new List<IFeature>();
             _name = MakeName();
         }
 
-//TODO remove this
-        private string MakeName() {
+        //TODO remove this
+        private string MakeName()
+        {
             Random rnd = new();
             int res = rnd.Next(1000, 9999);
-            return "Room [" + res +"]";
-
+            return "Room [" + res + "]";
         }
-        
-        public string GetName() {
+
+        public string GetName()
+        {
             return _name;
         }
 
-        public void AddPath(Dir dir, Room room) {
-            if (!Paths.SetPath(dir, room)) {
+        public void AddPath(Dir dir, Room room)
+        {
+            if (!Paths.SetPath(dir, room))
+            {
                 Console.WriteLine("Attempted to create room where there was already a path.");
-            } else {
+            }
+            else
+            {
                 Console.WriteLine("Added " + room.GetName() + " to " + dir.ToString() + " of " + _name);
             }
         }
@@ -37,11 +42,6 @@ namespace Cave
         public int GetPCount()
         {
             return Paths.GetPCount();
-        }
-
-        public virtual Encounter Enter()
-        {
-            return Enc;
         }
 
         public Room? ChoosePath()
@@ -55,7 +55,8 @@ namespace Cave
                     //TODO universal text entry
                     Console.Write(Paths.PrintOut());
                     string? dir = Console.ReadLine();
-                    if (dir == null) {
+                    if (dir == null)
+                    {
                         Console.WriteLine("No input received.");
                         continue;
                     }
@@ -78,6 +79,24 @@ namespace Cave
                 TextWriter errorWriter = Console.Error;
                 errorWriter.WriteLine(e.Message);
                 return null;
+            }
+        }
+
+        public void AddFeature(IFeature feature)
+        {
+            Features.Add(feature);
+        }
+
+        public void Enter(Hero hero)
+        {
+            Console.WriteLine("Entering " + _name);
+            foreach (IFeature feature in Features)
+            {
+                feature.Trigger(hero.GetParty());
+                if (hero.GetStatus() == Status.DEAD)
+                {
+                    return;
+                }
             }
         }
     }

@@ -1,10 +1,11 @@
 namespace Cave
 {
+    //TODO remove
     public class Entrance : Room 
     {
         public Entrance() { }
 
-        public override Encounter Enter()
+        public Encounter Enter()
         {
             return new Encounter();
         }
