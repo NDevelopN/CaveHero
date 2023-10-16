@@ -4,7 +4,7 @@ namespace Cave
     {
         private int _maxCompanions = 3;
 
-        private List<Creature> _companions;
+        private List<Creature> _party;
 
         public Hero() : base()
         {
@@ -13,7 +13,7 @@ namespace Cave
             Atk = 1;
             Spd = new Die(4);
             Items = new Dictionary<string, Item>() { { "Potion", new Potion(6, 1) } };
-            _companions = new List<Creature>();
+            _party = new List<Creature> { this };
         }
 
         public void UseItem(string name)
@@ -70,9 +70,9 @@ namespace Cave
 
         public bool Join(Creature companion)
         {
-            if (_companions.Count < _maxCompanions)
+            if (_party.Count < _maxCompanions + 1)
             {
-                _companions.Add(companion);
+                _party.Add(companion);
                 return true;
             }
 
@@ -96,12 +96,12 @@ namespace Cave
 
         private bool CompanionDamage(int val)
         {
-            int cCount = _companions.Count;
+            int cCount = _party.Count;
             if (cCount > 0)
             {
                 Random rnd = new();
                 int i = rnd.Next(0, cCount);
-                Creature target = _companions[i];
+                Creature target = _party[i];
 
                 //TODO add some stance mechanic to change how this works
                 if (Spd.Roll(1, false) < target.RollSpd(1))
@@ -115,7 +115,7 @@ namespace Cave
                         }
                         else
                         {
-                            _companions.Remove(target);
+                            _party.Remove(target);
                             Console.WriteLine("Farewell, " + target.GetName() + "...");
                         }
                     }
@@ -128,7 +128,7 @@ namespace Cave
 
         public bool CheckSuccess(string name)
         {
-            foreach (Creature companion in _companions)
+            foreach (Creature companion in _party)
             {
                 if (companion.GetName() == name)
                 {
@@ -137,6 +137,10 @@ namespace Cave
             }
 
             return false;
+        }
+
+        public List<Creature> GetParty() {
+            return _party;
         }
     }
 }
