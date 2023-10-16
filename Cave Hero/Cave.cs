@@ -1,6 +1,3 @@
-using System.Reflection.Metadata.Ecma335;
-using System.Xml.Schema;
-
 namespace Cave
 {
 
@@ -23,6 +20,8 @@ namespace Cave
             }
         }
 
+        private RoomBuilder _builder;
+
         private Dictionary<Coord, Room> _grid;
         private Entrance? _entrance;
 
@@ -38,6 +37,8 @@ namespace Cave
             MaxY = y;
 
             Size = size;
+
+            _builder = new RoomBuilder();
         }
 
         public Entrance? Generate()
@@ -97,7 +98,7 @@ namespace Cave
 
                         roomCount++;
 
-                        nRoom = new Room();
+                        nRoom = _builder.CreateRoom();
                         _grid.Add(nextLoc, nRoom);
 
                         stack.Push(nextLoc);
@@ -211,7 +212,8 @@ namespace Cave
                     //West
                     if (curLoc.X <= 0)
                     {
-                        return curLoc; }
+                        return curLoc;
+                    }
                     nextCoord = new Coord(curLoc.X - 1, curLoc.Y);
                     break;
                 case 1:
