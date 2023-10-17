@@ -10,6 +10,8 @@ namespace Cave
 
         protected Dictionary<string, Item> Items;
 
+        protected Creature Target;
+
         protected Creature()
         {
             Spd = new Die(1, 1);
@@ -55,7 +57,7 @@ namespace Cave
             return Spd;
         }
 
-        public int RollSpd(int count)
+        public int RollSpd()
         {
             Console.WriteLine(Name + " rolls for Spd.");
             return Spd.Roll();
@@ -65,6 +67,28 @@ namespace Cave
         {
             return string.Format("_{0}_\nhp: {1}\natk:{2}\nspd: {3}",
                     Name, Hp, Atk, Spd.GetSides());
+        }
+
+        /**
+         * Choose next creature to attack.
+         * Overriding this function allows for varied target selection behaviour such as:
+         *      - RandomEnemy       -   Target a random enemy to be the next target.
+         *      - RandomCreature    -   Target any random creature, friend or foe.
+         *      - RecentAttacker    -   Target last creature to have dealt damage (needs fallback).
+         *      - Soft target       -   Target weakest foe.
+         *      - Hard target       -   Target toughest foe.
+         *      - Leader's target   -   Target the target of an ally.
+         */
+        protected virtual void SelectTarget(List<Creature> allies, List<Creature> enemies) {
+            Random rnd = new();
+            Target = enemies[rnd.Next(0, enemies.Count)];
+        }
+
+
+        public virtual void DoCombat(List<Creature> allies, List<Creature> enemies) {
+            SelectTarget(allies, enemies);
+            Target.Damage(Atk);
+            //TODO
         }
 
         public virtual void Damage(int val)

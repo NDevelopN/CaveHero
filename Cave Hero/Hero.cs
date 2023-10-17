@@ -104,7 +104,7 @@ namespace Cave
                 Creature target = _party[i];
 
                 //TODO add some stance mechanic to change how this works
-                if (Spd.Roll() < target.RollSpd(1))
+                if (Spd.Roll() < target.RollSpd())
                 {
                     target.Damage(val);
                     if (target.GetHP() < 2)

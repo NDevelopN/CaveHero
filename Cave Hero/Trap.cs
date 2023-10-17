@@ -55,7 +55,7 @@ namespace Cave {
         protected void ApplyTrap(Creature target) {
             string name = target.GetName();
 
-            int tSpd = target.RollSpd(1);
+            int tSpd = target.RollSpd();
             int dSpd = _spd.Roll();
 
             if (tSpd >= dSpd)
