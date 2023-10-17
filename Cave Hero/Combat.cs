@@ -1,56 +1,90 @@
-namespace Cave {
+using System.Collections;
+
+namespace Cave
+{
     class Combat : IFeature
     {
         private List<Creature> _monsters;
-
         private bool _fought;
 
-        public Combat() {
-            _monsters = new List<Creature>();
+        public Combat()
+        {
+            _monsters = new();
+
             _fought = false;
         }
 
-        public void SetMonsters(List<Creature> monsters) {
+        public void SetMonsters(List<Creature> monsters)
+        {
             _monsters = monsters;
         }
 
-        public void AddMonster(Creature monster) {
+        public void AddMonster(Creature monster)
+        {
             _monsters.Add(monster);
         }
 
-
         public void Trigger(List<Creature> party)
         {
-            if (_monsters.Count == 0) {
+            if (_monsters.Count == 0)
+            {
                 return;
             }
 
             if (_fought)
             {
                 Aftermath();
-            } else {
+            }
+            else
+            {
                 Fight(party);
             }
         }
 
-        public string Mention() {
+        public string Mention()
+        {
             return "There are monsters in this room, ready to fight!";
         }
 
-        protected void Fight(List<Creature> party) {
-            Console.WriteLine("This is where combat would have happened");
+        protected void Fight(List<Creature> party)
+        {
+            Initiative.Clear();
+            Initiative.AddToInitiative(party);
+            Initiative.AddToInitiative(_monsters);
+
+            Creature next;
+            while (party[0].GetStatus() != Status.DEAD && CheckMonsters())
+            {
+                next = Initiative.Next();
+                if (next.GetStatus() != Status.OK)
+                {
+                    if (_monsters.Contains(next)) {
+                        //TODO
+                        _monsters.Remove(next);
+                    }
+                    continue;
+                }
+            }
+
             _fought = true;
             //TODO
         }
 
-        protected void Aftermath() {
+        protected bool CheckMonsters()
+        {
+            //TODO
+            return _monsters.Count > 0;
+        }
+
+        protected void Aftermath()
+        {
             Console.WriteLine("You won a battle here against:");
-            foreach (Creature monster in _monsters) {
+            foreach (Creature monster in _monsters)
+            {
                 Console.WriteLine(monster.GetName());
             }
             Console.WriteLine("Their bodies lay here still, growing cold.");
             //TODO
         }
     }
-
 }
