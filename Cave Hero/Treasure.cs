@@ -41,7 +41,8 @@ namespace Cave {
             }
 
             foreach (Item item in _haul) {
-                hero.AddItem(item);
+                Console.WriteLine(item.ToString());
+                hero.CollectItem(item);
             }
 
             _found = true;
