@@ -9,8 +9,8 @@ namespace Cave
         public Hero() : base()
         {
             Name = "Hero";
-            Hp = 3;
-            Atk = 1;
+            Hp = 12;
+            Atk = 3;
             Spd = new Die(4, 1);
             Items = new Dictionary<string, Item>() { { "Potion", new Potion(6, 1, 1) } };
             _party = new List<Creature> { this };
@@ -86,7 +86,7 @@ namespace Cave
             base.Damage(val);
             if (Status != Status.DEAD)
             {
-                if (Hp <= 2)
+                if (Hp <= 5)
                 {
                     Console.WriteLine("Health is low, using Potion.");
                     UseItem("Potion");
