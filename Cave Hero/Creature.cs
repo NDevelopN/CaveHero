@@ -10,7 +10,7 @@ namespace Cave
 
         protected Dictionary<string, Item> Items;
 
-        protected Creature Target;
+        protected Creature? Target;
 
         protected Creature()
         {
@@ -84,9 +84,12 @@ namespace Cave
             Target = enemies[rnd.Next(0, enemies.Count)];
         }
 
-
         public virtual void DoCombat(List<Creature> allies, List<Creature> enemies) {
             SelectTarget(allies, enemies);
+            if (Target == null) {
+                return;
+            }
+
             Target.Damage(Atk);
             //TODO
         }
