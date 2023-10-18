@@ -2,7 +2,7 @@ using System.Collections;
 
 namespace Cave
 {
-    class Combat : IFeature
+    public class Combat : IFeature
     {
         private List<Creature> _monsters;
         private bool _fought;
@@ -28,6 +28,7 @@ namespace Cave
         {
             if (_monsters.Count == 0)
             {
+                Console.WriteLine("What a relief! No monsters here.");
                 return;
             }
 
@@ -48,6 +49,7 @@ namespace Cave
 
         protected void Fight(List<Creature> party)
         {
+            Console.WriteLine("There are monsters, here. It's time to fight!");
             Initiative.Clear();
             Initiative.AddToInitiative(party);
             Initiative.AddToInitiative(_monsters);
@@ -65,7 +67,7 @@ namespace Cave
                     continue;
                 }
             }
-
+            Console.WriteLine("You won the fight, well done!");
             _fought = true;
             //TODO
         }
