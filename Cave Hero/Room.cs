@@ -14,12 +14,6 @@ namespace Cave
             _name = MakeName();
         }
 
-        public Room(string name) {
-            _name = name;
-            Paths = new();
-            Features = new List<IFeature>();
-        }
-
         //TODO remove this
         private string MakeName()
         {
@@ -31,6 +25,10 @@ namespace Cave
         public string GetName()
         {
             return _name;
+        }
+
+        public void SetName(string name){
+            _name = name;
         }
 
         public void AddPath(Dir dir, Room room)
@@ -93,11 +91,52 @@ namespace Cave
             Features.Add(feature);
         }
 
+        public string GetTopFeature() {
+            if (_name == "Entrance") return "E";
+            if (_name == "EXIT") return "e";
+
+            int top = 0;
+            foreach (IFeature feature in Features)
+            {
+                if (feature.GetType().Name == "Hostage")
+                {
+                    return "H";
+                }
+                else if (feature.GetType().Name == "Combat")
+                {
+                    top = 3;
+                }
+                else if (feature.GetType().Name == "Trap")
+                {
+                    if (top < 2)
+                    {
+                        top = 2;
+                    }
+                }
+                else if (feature.GetType().Name == "Treasure")
+                {
+                    if (top < 1)
+                    {
+                        top = 1;
+                    }
+                }
+            }
+
+            return top switch
+            {
+                3 => "C",
+                2 => "T",
+                1 => "$",
+                _ => " ",
+            };
+        }
+
         public void Enter(Hero hero)
         {
             Console.WriteLine("Entering " + _name);
             foreach (IFeature feature in Features)
             {
+                Console.WriteLine("Feature: " + feature.GetType().Name);
                 feature.Trigger(hero.GetParty());
                 if (hero.GetStatus() == Status.DEAD)
                 {
