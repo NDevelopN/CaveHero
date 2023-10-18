@@ -1,8 +1,6 @@
 namespace Cave
 {
-
-    public class Cave
-    {
+    public class Cave {
         protected struct Coord
         {
             public int X;
@@ -98,7 +96,7 @@ namespace Cave
 
                         roomCount++;
 
-                        nRoom = _builder.CreateRoom();
+                        nRoom = _builder.CreateRoom("(" + nextLoc.X + ", " + nextLoc.Y + ")");
                         _grid.Add(nextLoc, nRoom);
 
                         stack.Push(nextLoc);
@@ -143,7 +141,6 @@ namespace Cave
 
             return _entrance;
         }
-
         protected Coord SelectEntrance()
         {
             int x, y;
@@ -181,7 +178,7 @@ namespace Cave
                     break;
             }
 
-            _entrance = _builder.CreateEntrance(dir);
+            _entrance = _builder.CreateEntranceRoom(dir);
             _grid.Add(entCoord, _entrance);
 
             return entCoord;
