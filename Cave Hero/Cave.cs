@@ -139,8 +139,45 @@ namespace Cave
                 Console.WriteLine("Did not generate all intended rooms: " + roomCount + "/" + Size);
             }
 
+            CreateMap();
+
             return _entrance;
         }
+
+        private void CreateMap()
+        {
+            List<List<string>> map = new();
+            List<string> row = new();
+
+            for (int i = 0; i <= MaxY; i++)
+            {
+                row = new();
+                for (int j = 0; j <= MaxX; j++)
+                {
+                    row.Add("[/]");
+                }
+                map.Add(row);
+            }
+
+            foreach (KeyValuePair<Coord, Room> cell in _grid)
+            {
+                Coord coord = cell.Key;
+                row = map[coord.Y];
+                row[coord.X] = "[" + cell.Value.GetTopFeature() + "]";
+                map[coord.Y] = row;
+            }
+
+            for (int y = MaxY; y >= 0; y--)
+            {
+                row = map[y];
+                for (int x = 0; x <= MaxX; x++)
+                {
+                    Console.Write(row[x]);
+                }
+                Console.WriteLine();
+            }
+        }
+
         protected Coord SelectEntrance()
         {
             int x, y;
