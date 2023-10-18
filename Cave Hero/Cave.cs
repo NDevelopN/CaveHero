@@ -167,9 +167,16 @@ namespace Cave
                 map[coord.Y] = row;
             }
 
+            Console.Write("  ");
+            for (int x = 0; x <= MaxX; x++) {
+                Console.Write(" " + x + " ");
+            }
+            Console.WriteLine();
+
             for (int y = MaxY; y >= 0; y--)
             {
                 row = map[y];
+                Console.Write(y + "|");
                 for (int x = 0; x <= MaxX; x++)
                 {
                     Console.Write(row[x]);
