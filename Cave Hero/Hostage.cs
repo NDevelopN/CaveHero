@@ -2,11 +2,16 @@
 namespace Cave {
     public class Hostage : IFeature
     {
+        private CreatureDirector _cDir;
+        private CreatureBuilder _cBuild;
         private bool _rescued;
         private Creature _hostage;
 
-        public Hostage(Creature hostage) {
-            _hostage = hostage;
+        public Hostage() {
+            _cDir = new();
+            _cBuild = new();
+
+            _hostage = _cDir.CreateHostage(_cBuild, null);
             _rescued = false;
         }
 
