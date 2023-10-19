@@ -4,6 +4,7 @@ namespace Cave
     {
         OK,
         WIN,
+        DEFEATED,
         DEAD
     }
 

@@ -32,7 +32,7 @@ namespace Cave
             }
 
             Room? curRoom = ent;
-            while (hero.GetStatus() != Status.DEAD && hero.GetStatus() != Status.WIN)
+            while (hero.GetStatus() != Status.DEFEATED && hero.GetStatus() != Status.WIN)
             {
                 curRoom = curRoom.ChoosePath();
                 if (curRoom == null)

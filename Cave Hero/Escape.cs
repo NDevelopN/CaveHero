@@ -21,7 +21,7 @@ namespace Cave
             else
             {
                 Console.WriteLine("There's no going back now, your Sibling is dead for sure...");
-                hero.SetStatus(Status.DEAD);
+                hero.SetStatus(Status.DEFEATED);
             }
         }
     }

@@ -27,7 +27,8 @@ namespace Cave
             return _name;
         }
 
-        public void SetName(string name){
+        public void SetName(string name)
+        {
             _name = name;
         }
 
@@ -91,7 +92,8 @@ namespace Cave
             Features.Add(feature);
         }
 
-        public string GetTopFeature() {
+        public string GetTopFeature()
+        {
             if (_name == "Entrance") return "E";
             if (_name == "EXIT") return "e";
 
@@ -138,7 +140,7 @@ namespace Cave
             {
                 Console.WriteLine("Feature: " + feature.GetType().Name);
                 feature.Trigger(hero.GetParty());
-                if (hero.GetStatus() == Status.DEAD)
+                if (hero.GetStatus() == Status.DEFEATED)
                 {
                     return;
                 }
