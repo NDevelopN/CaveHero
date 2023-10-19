@@ -2,29 +2,26 @@ namespace Cave
 {
     public class Creature
     {
-        protected Status Status = Status.OK;
-        protected string Name = "";
-        protected int Hp = 0;
-        protected int Atk = 0;
+        protected Status Status;
+        protected string Name;
+        protected int Hp;
+        protected Die Atk;
         protected Die Spd;
 
         protected Dictionary<string, Item> Items;
 
         protected Creature? Target;
 
-        protected Creature()
-        {
-            Spd = new Die(1, 1);
-            Items = new Dictionary<string, Item>();
-        }
-
-        public Creature(string name, int hp, int atk, int spd)
+        public Creature(string name, int hp, Die atk, Die spd)
         {
             Name = name;
             Hp = hp;
             Atk = atk;
-            Spd = new Die(spd, 1);
-            Items = new Dictionary<string, Item>();
+            Spd = spd;
+
+            Status = Status.OK;
+            Items = new();
+            Target = null;
         }
 
         public Status GetStatus()
@@ -49,17 +46,11 @@ namespace Cave
 
         public int GetAtk()
         {
-            return Atk;
-        }
-
-        public Die GetSpd()
-        {
-            return Spd;
+            return Atk.Roll();
         }
 
         public int RollSpd()
         {
-            Console.WriteLine(Name + " rolls for Spd.");
             return Spd.Roll();
         }
 
@@ -79,18 +70,21 @@ namespace Cave
          *      - Hard target       -   Target toughest foe.
          *      - Leader's target   -   Target the target of an ally.
          */
-        protected virtual void SelectTarget(List<Creature> allies, List<Creature> enemies) {
+        protected virtual void SelectTarget(List<Creature> allies, List<Creature> enemies)
+        {
             Random rnd = new();
             Target = enemies[rnd.Next(0, enemies.Count)];
         }
 
-        public virtual void DoCombat(List<Creature> allies, List<Creature> enemies) {
+        public virtual void DoCombat(List<Creature> allies, List<Creature> enemies)
+        {
             SelectTarget(allies, enemies);
-            if (Target == null) {
+            if (Target == null)
+            {
                 return;
             }
 
-            Target.Damage(Atk);
+            Target.Damage(GetAtk());
             //TODO
         }
 
@@ -104,8 +98,16 @@ namespace Cave
             ChangeHP(val);
         }
 
-        public virtual void AddItem(Item item) {
-            Items.Add(item.GetName(), item);
+        public virtual bool AddItem(Item item)
+        {
+            string name = item.GetName();
+            if (Items.ContainsKey(name))
+            {
+                return Items[name].AddUses(item.GetUses());
+            }
+
+            Items.Add(name, item);
+            return true;
         }
 
         public virtual Item[] GetItems()
@@ -121,6 +123,20 @@ namespace Cave
             }
 
             return Items[name].GetUses();
+        }
+
+        public bool UseItem(string name, Creature? target)
+        {
+            if (Items.ContainsKey(name))
+            {
+                if (Items[name].Use(target))
+                {
+                    Items.Remove(name);
+                }
+                return true;
+            }
+
+            return false;
         }
 
         protected virtual void ChangeHP(int val)

@@ -6,66 +6,18 @@ namespace Cave
 
         private List<Creature> _party;
 
-        public Hero() : base()
+        public Hero(string name, int hp, Die atk, Die spd, int maxCompanions) :
+                    base(name, hp, atk, spd)
         {
-            Name = "Hero";
-            Hp = 12;
-            Atk = 3;
-            Spd = new Die(4, 1);
-            Items = new Dictionary<string, Item>() { { "Potion", new Potion(6, 1, 1) } };
+            AddItem(new Potion(6, 1, 1));
+            _party = new();
+            _maxCompanions = maxCompanions;
             _party = new List<Creature> { this };
         }
 
         public void UseItem(string name)
         {
             UseItem(name, this);
-        }
-
-        public void UseItem(string name, Creature target)
-        {
-            if (!Items.ContainsKey(name))
-            {
-                Console.WriteLine("No " + name + " in Inventory.");
-                return;
-            }
-
-            Items[name].Use(target);
-
-            int uses = Items[name].GetUses();
-            Console.Write("There are " + uses + " uses remaining. ");
-            if (uses == 0)
-            {
-                Console.WriteLine("It is all gone!");
-                Items.Remove(name);
-            }
-            else
-            {
-                Console.WriteLine();
-            }
-        }
-
-        public bool CollectItem(Item item)
-        {
-            string name = item.GetName();
-            if (Items.ContainsKey(name))
-            {
-                if (Items[name].AddUses(item.GetUses()))
-                {
-                    Console.WriteLine("Now have " + Items[name].GetUses() + " uses.");
-                }
-                else
-                {
-                    Console.WriteLine("Maximum uses " + Items[name].GetUses() + " in Inventory.");
-                    return false;
-                }
-            }
-            else
-            {
-                Console.WriteLine("New item " + name + " added to Inventory.");
-                Items.Add(name, item);
-            }
-
-            return true;
         }
 
         public bool Join(Creature companion)
@@ -139,7 +91,8 @@ namespace Cave
             return false;
         }
 
-        public List<Creature> GetParty() {
+        public List<Creature> GetParty()
+        {
             return _party;
         }
     }

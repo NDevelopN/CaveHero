@@ -2,9 +2,23 @@ namespace Cave
 {
     public class Program
     {
+
+        private static Hero CreateHero() {
+            HeroBuilder builder = new()
+            {
+                Name = "Hero",
+                HP = 12,
+                Atk = new Die(3, 2),
+                Spd = new Die(3, 3),
+                MaxCompanions = 3
+            };
+
+            return builder.Build();
+        }
         static void Main(string[] args)
         {
-            Hero hero = new();
+
+            Hero hero = CreateHero(); 
 
             Console.WriteLine("Welcome to the Cave!");
             Console.WriteLine("Nasty monsters took your sibling into this Cave.");

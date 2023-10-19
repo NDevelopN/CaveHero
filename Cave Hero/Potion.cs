@@ -10,10 +10,15 @@ namespace Cave
             _die = new Die(size, count);
         }
 
-        public override void Use(Creature target)
+        public override bool Use(Creature? target)
         {
-            Use();
+            //TODO
+            if (target == null) {
+                return false;
+            }
+
             target.Heal(_die.Roll());
+            return Use();
         }
 
         public override bool AddUses(int uses)

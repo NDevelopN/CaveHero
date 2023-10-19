@@ -42,7 +42,7 @@ namespace Cave {
 
             foreach (Item item in _haul) {
                 Console.WriteLine(item.ToString());
-                hero.CollectItem(item);
+                hero.AddItem(item);
             }
 
             _found = true;

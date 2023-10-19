@@ -16,9 +16,16 @@ namespace Cave
                 new List<Type> { typeof(Combat) },
                 new List<Type> { typeof(Trap), typeof(Treasure) });
 
+        private CreatureDirector _cDir;
+        private CreatureBuilder _cBuild;
+
 
         public RoomBuilder()
         {
+
+            _cDir = new();
+            _cBuild = new();
+
             chances = new Dictionary<string, FeatureChance>
             {
                 { "Trap", trapChance },
@@ -107,7 +114,7 @@ namespace Cave
         protected Hostage CreateHostage()
         {
             //TODO
-            Creature hostage = new Creature("Sibling", 5, 0, 2);
+            Creature hostage = _cDir.CreateHostage(_cBuild, null); 
             return new Hostage(hostage);
         }
 

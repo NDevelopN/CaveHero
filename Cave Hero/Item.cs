@@ -22,15 +22,25 @@ namespace Cave
             return Uses;
         }
 
-        protected virtual void Use()
+        public virtual bool Use()
         {
             Uses--;
+            if (Uses <= 0)
+            {
+                return true;
+            }
+            return false;
         }
 
-        public virtual void Use(Creature target)
+        public virtual bool Use(Creature? target)
         {
+            if (target == null)
+            {
+                return Use();
+            }
 
-            Use();
+            Console.Write("You can't target a creature with " + Name);
+            return false;
         }
 
         public virtual bool AddUses(int uses)
