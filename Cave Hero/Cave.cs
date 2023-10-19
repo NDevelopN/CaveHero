@@ -51,7 +51,6 @@ namespace Cave
             while (stack.Count > 0)
             {
                 curLoc = stack.Pop();
-                Console.WriteLine("Coord: " + curLoc.ToString());
 
                 Room room = _grid[curLoc];
                 int pCount = room.GetPCount();
@@ -59,24 +58,20 @@ namespace Cave
                 //While all 4 paths have not been accounted for, and while there are more rooms to add
                 while (pCount < 4 && roomCount < Size)
                 {
-                    Console.WriteLine("PCount: " + pCount);
 
                     Random rnd = new();
                     int res = rnd.Next(0, 100);
                     int rChance = RoomChance(room.GetPCount(), roomCount);
                     if (res > rChance)
                     {
-                        Console.WriteLine("Failed chance (" + res + "/" + rChance + ")");
                         pCount++;
                         continue;
                     }
 
                     Coord nextLoc = ContinuePath(curLoc);
-                    Console.WriteLine("Next Coord: " + nextLoc.ToString());
 
                     if (nextLoc.Equals(curLoc))
                     {
-                        Console.WriteLine("Same as current, invalid pathway.");
                         continue;
                     }
 
@@ -86,14 +81,9 @@ namespace Cave
                     {
                         nRoom = _grid[nextLoc];
                         pCount++;
-                        Console.WriteLine("Existing room, no generation");
                     }
                     else
                     {
-                        Console.WriteLine("Next space is open...");
-
-                        Console.WriteLine("New room generation");
-
                         roomCount++;
 
                         nRoom = _builder.CreateRoom("(" + nextLoc.X + ", " + nextLoc.Y + ")");
