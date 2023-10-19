@@ -4,24 +4,43 @@ namespace Cave
 {
     public class Combat : IFeature
     {
+        private CreatureDirector _cDir;
+        private CreatureBuilder _cBuild;
         private List<Creature> _monsters;
+        private int _monCount;
+
         private bool _fought;
 
-        public Combat()
+
+        public Combat(double maxPower)
         {
+            _cDir = new();
+            _cBuild = new();
+
             _monsters = new();
+            _monCount = 0;
 
-            _fought = false;
+            GenerateMonsters(maxPower);
         }
 
-        public void SetMonsters(List<Creature> monsters)
+        private void GenerateMonsters(double maxPower)
         {
-            _monsters = monsters;
-        }
+            double power = 0;
+            while (power < maxPower)
+            {
+                Creature monster = _cDir.CreateRandomMonster(_cBuild);
+                double curPwr = power + monster.GetPower();
+                if (curPwr > maxPower + 1)
+                {
+                    power++;
+                    continue;
+                }
 
-        public void AddMonster(Creature monster)
-        {
-            _monsters.Add(monster);
+                power = curPwr;
+
+                _monsters.Add(monster);
+                _monCount++;
+            }
         }
 
         public void Trigger(List<Creature> party)
@@ -55,27 +74,51 @@ namespace Cave
             Initiative.AddToInitiative(_monsters);
 
             Creature next;
-            while (party[0].GetStatus() != Status.DEAD && CheckMonsters())
+            while (party[0].GetStatus() != Status.DEFEATED && CheckMonsters())
             {
                 next = Initiative.Next();
-                if (next.GetStatus() != Status.OK)
+                Status status = next.GetStatus();
+                if (status == Status.OK)
                 {
-                    if (_monsters.Contains(next)) {
-                        //TODO
-                        _monsters.Remove(next);
+                    if (_monsters.Contains(next))
+                    {
+                        next.DoCombat(_monsters, party);
                     }
-                    continue;
+                    else
+                    {
+                        next.DoCombat(party, _monsters);
+                    }
                 }
             }
-            Console.WriteLine("You won the fight, well done!");
-            _fought = true;
-            //TODO
+
+            if (party[0].GetStatus() != Status.OK)
+            {
+                Console.WriteLine("You fall in battle, another victim of the Cave.");
+            }
+            else
+            {
+                Console.WriteLine("You won the fight, well done!");
+                Console.WriteLine("State of your party: ");
+                foreach (Creature member in party)
+                {
+                    Console.WriteLine(member.GetName() + ": " + member.GetHP());
+                }
+                _fought = true;
+            }
         }
 
         protected bool CheckMonsters()
         {
-            //TODO
-            return _monsters.Count > 0;
+            foreach (Creature monster in _monsters)
+            {
+                if (monster.GetStatus() == Status.DEFEATED)
+                {
+                    monster.SetStatus(Status.DEAD);
+                    _monCount--;
+                }
+            }
+
+            return _monCount > 0;
         }
 
         protected void Aftermath()
