@@ -56,8 +56,17 @@ namespace Cave
 
         public virtual string PrintStats()
         {
-            return string.Format("_{0}_\nhp: {1}\natk:{2}\nspd: {3}",
-                    Name, Hp, Atk, Spd.GetSides());
+            return string.Format("_{0}_\nhp: {1}\natk:{2}\nspd: {3}\npwr: {4}",
+                    Name, Hp, Atk.GetAvg(), Spd.GetAvg(), GetPower());
+        }
+
+        public double GetPower() {
+            double pwr = 0;
+            pwr += Hp;
+            pwr += Atk.GetAvg() * 2;
+            pwr += Spd.GetAvg() * 1.2;
+
+            return pwr;
         }
 
         /**
@@ -84,12 +93,14 @@ namespace Cave
                 return;
             }
 
+            Console.WriteLine(Name + " attacks " + Target.GetName());
             Target.Damage(GetAtk());
             //TODO
         }
 
         public virtual void Damage(int val)
         {
+            Console.WriteLine(Name + " is hit for " + val + "dmg.");
             ChangeHP(-val);
         }
 
@@ -154,7 +165,7 @@ namespace Cave
 
         protected virtual void Die()
         {
-            Status = Status.DEAD;
+            Status = Status.DEFEATED;
             Console.WriteLine(Name + " has been defeated!");
         }
     }
