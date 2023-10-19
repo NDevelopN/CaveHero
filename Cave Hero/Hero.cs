@@ -31,12 +31,40 @@ namespace Cave
             return false;
         }
 
+        public override void DoCombat(List<Creature> allies, List<Creature> enemies)
+        {
+            Console.WriteLine("Potential Targets");
+            foreach (Creature target in enemies)
+            {
+                if (target.GetStatus() == Status.OK)
+                {
+                    Console.Write("[" + target.GetName() + "]");
+                }
+            }
+
+            while (true)
+            {
+                string? selection = Console.ReadLine();
+                if (selection != null)
+                {
+                    foreach (Creature target in enemies)
+                    {
+                        if (target.GetName() == selection)
+                        {
+                            target.Damage(GetAtk());
+                            return;
+                        }
+                    }
+                }
+
+                Console.WriteLine("Invalid target '" + selection + "'.");
+            }
+        }
+
         public override void Damage(int val)
         {
-            if (CompanionDamage(val)) { return; }
-
             base.Damage(val);
-            if (Status != Status.DEAD)
+            if (Status != Status.DEFEATED)
             {
                 if (Hp <= 5)
                 {
@@ -44,38 +72,6 @@ namespace Cave
                     UseItem("Potion");
                 }
             }
-        }
-
-        private bool CompanionDamage(int val)
-        {
-            int cCount = _party.Count;
-            if (cCount > 0)
-            {
-                Random rnd = new();
-                int i = rnd.Next(0, cCount);
-                Creature target = _party[i];
-
-                //TODO add some stance mechanic to change how this works
-                if (Spd.Roll() < target.RollSpd())
-                {
-                    target.Damage(val);
-                    if (target.GetHP() < 2)
-                    {
-                        if (target.GetStatus() != Status.DEAD)
-                        {
-                            UseItem("Potion", target);
-                        }
-                        else
-                        {
-                            _party.Remove(target);
-                            Console.WriteLine("Farewell, " + target.GetName() + "...");
-                        }
-                    }
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         public bool CheckSuccess(string name)
