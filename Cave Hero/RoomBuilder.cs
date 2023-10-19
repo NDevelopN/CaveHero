@@ -16,16 +16,10 @@ namespace Cave
                 new List<Type> { typeof(Combat) },
                 new List<Type> { typeof(Trap), typeof(Treasure) });
 
-        private CreatureDirector _cDir;
-        private CreatureBuilder _cBuild;
-
+        private double _maxPow = 40;
 
         public RoomBuilder()
         {
-
-            _cDir = new();
-            _cBuild = new();
-
             chances = new Dictionary<string, FeatureChance>
             {
                 { "Trap", trapChance },
@@ -49,7 +43,6 @@ namespace Cave
 
                 if (chance > rand)
                 {
-                    //if (fc.Value.GetChance(features) > rnd.Next(0, 100)) {
                     switch (fc.Key)
                     {
                         case "Trap":
@@ -101,9 +94,10 @@ namespace Cave
 
         protected Combat CreateCombat()
         {
-            //TODO
-            return new Combat();
+            Combat combat = new(_maxPow);
+            return combat;
         }
+
         protected Treasure CreateTreasure()
         {
             //TODO
@@ -111,11 +105,11 @@ namespace Cave
             return new Treasure(haul);
 
         }
+        
         protected Hostage CreateHostage()
         {
             //TODO
-            Creature hostage = _cDir.CreateHostage(_cBuild, null); 
-            return new Hostage(hostage);
+            return new Hostage();
         }
 
         public Room CreateEntranceRoom(Dir dir)
