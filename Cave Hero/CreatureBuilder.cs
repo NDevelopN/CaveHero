@@ -16,5 +16,12 @@ namespace Cave {
         public virtual Creature Build() {
             return new Creature(Name, HP, Atk, Spd);
         }
+
+        public void Reset() {
+            Name = "";
+            HP = 0;
+            Atk = new Die(0, 0);
+            Spd = new Die(0, 0);
+        }
     }
 }
