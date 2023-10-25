@@ -1,5 +1,3 @@
-using Server;
-
 namespace Cave
 {
     public class Room
@@ -57,13 +55,13 @@ namespace Cave
         {
             try
             {
-                IOBuffer.WriteMsg("You are in " + _name);
+                Game.IO.WriteMsg("You are in " + _name);
 
                 List<string> options = Paths.GetOptions();
                 while (true)
                 {
-                    IOBuffer.WriteOption("Where to next?", options);
-                    Message reply = IOBuffer.NextInput();
+                    Game.IO.WriteOption("Where to next?", options);
+                    Server.Message reply = Game.IO.NextInput();
                     string dir = reply.Text;
 
                     dir = dir.ToUpper();
@@ -137,10 +135,10 @@ namespace Cave
 
         public void Enter(Hero hero)
         {
-            IOBuffer.WriteMsg("Entering " + _name);
+            Game.IO.WriteMsg("Entering " + _name);
             foreach (IFeature feature in Features)
             {
-                IOBuffer.WriteMsg("Feature: " + feature.GetType().Name);
+                Game.IO.WriteMsg("Feature: " + feature.GetType().Name);
                 feature.Trigger(hero.GetParty());
                 if (hero.GetStatus() == Status.DEFEATED)
                 {

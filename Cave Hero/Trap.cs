@@ -61,18 +61,18 @@ namespace Cave {
 
             if (tSpd >= dSpd)
             {
-                IOBuffer.WriteMsg(" It triggers (" + dSpd + ") , but " + name + " (" + tSpd + ") manages to quickly evade it!");
+                Game.IO.WriteMsg(" It triggers (" + dSpd + ") , but " + name + " (" + tSpd + ") manages to quickly evade it!");
             }
             else
             {
                 int damage = _dmg.Roll();
-                IOBuffer.WriteMsg("A trap tiggers and catches " + name + " off guard, dealing " + damage + " damage !");
+                Game.IO.WriteMsg("A trap tiggers and catches " + name + " off guard, dealing " + damage + " damage !");
                 target.Damage(damage);
             }
         }
 
         protected void Inert() {
-            IOBuffer.WriteMsg("There was a trap in this room, but it no longer functions.");
+            Game.IO.WriteMsg("There was a trap in this room, but it no longer functions.");
         }
     }
 }

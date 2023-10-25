@@ -4,15 +4,15 @@ namespace Server
 {
     public class IOBuffer
     {
-        private static BlockingCollection<Message> _input = new();
-        private static BlockingCollection<Message> _output = new();
+        private BlockingCollection<Message> _input = new();
+        private BlockingCollection<Message> _output = new();
 
-        public static void WriteInput(Message input)
+        public void WriteInput(Message input)
         {
             _input.Add(input);
         }
 
-        public static Message NextInput()
+        public Message NextInput()
         {
             while (_input.Count == 0) { }
             return _input.Take();
@@ -20,30 +20,30 @@ namespace Server
 
         ////////////////////////////////////////////////
 
-        public static void WriteHeading(string header)
+        public void WriteHeading(string header)
         {
             Message msg = new Message(MsgType.Heading, header, null);
             _output.Add(msg);
         }
 
-        public static void WriteMsg()
+        public void WriteMsg()
         {
             WriteMsg("");
         }
 
-        public static void WriteMsg(string text)
+        public void WriteMsg(string text)
         {
             Message msg = new Message(MsgType.Message, text, new List<string>());
             _output.Add(msg);
         }
 
-        public static void WriteOption(string prompt, List<string> options)
+        public void WriteOption(string prompt, List<string> options)
         {
             Message msg = new Message(MsgType.Option, prompt, options);
             _output.Add(msg);
         }
 
-        public static Message NextOutput()
+        public Message NextOutput()
         {
             while (_output.Count == 0) { }
             return _output.Take();

@@ -38,16 +38,16 @@ namespace Cave
 
         private void Reward(Hero hero)
         {
-            IOBuffer.WriteMsg("You found a treasure chest! Contained within...");
+            Game.IO.WriteMsg("You found a treasure chest! Contained within...");
             if (_haul.Count == 0)
             {
-                IOBuffer.WriteMsg("Nothing... bummer");
+                Game.IO.WriteMsg("Nothing... bummer");
                 return;
             }
 
             foreach (Item item in _haul)
             {
-                IOBuffer.WriteMsg("" + item.ToString());
+                Game.IO.WriteMsg("" + item.ToString());
                 hero.AddItem(item);
             }
 
@@ -56,12 +56,12 @@ namespace Cave
 
         private void Recall()
         {
-            IOBuffer.WriteMsg("There was treasure here before. \nYou found:");
+            Game.IO.WriteMsg("There was treasure here before. \nYou found:");
             foreach (Item item in _haul)
             {
-                IOBuffer.WriteMsg(item.GetName() + " (" + item.GetUses() + ")");
+                Game.IO.WriteMsg(item.GetName() + " (" + item.GetUses() + ")");
             }
-            IOBuffer.WriteMsg("No, you don't get to grab it again.");
+            Game.IO.WriteMsg("No, you don't get to grab it again.");
         }
     }
 }

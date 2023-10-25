@@ -2,10 +2,11 @@ using Server;
 
 namespace Cave
 {
-    public class CaveHero
+    public class Game 
     {
+        [ThreadStatic] public static Server.IOBuffer IO;
 
-        private static Hero CreateHero()
+        private Hero CreateHero()
         {
             HeroBuilder builder = new()
             {
@@ -19,19 +20,20 @@ namespace Cave
             return builder.Build();
         }
 
-        public static void Game()
+        public void Start(IOBuffer io)
         {
+            IO = io;
             Hero hero = CreateHero();
 
-            IOBuffer.WriteMsg("Welcome to the Cave!");
-            IOBuffer.WriteMsg("Nasty monsters took your sibling into this Cave.");
-            IOBuffer.WriteMsg("You must hurry to save them, before it's too late!");
+            Game.IO.WriteMsg("Welcome to the Cave!");
+            Game.IO.WriteMsg("Nasty monsters took your sibling into this Cave.");
+            Game.IO.WriteMsg("You must hurry to save them, before it's too late!");
 
             Cave cave = new(6, 6, 12);
             Room? ent = cave.Generate();
             if (ent == null)
             {
-                IOBuffer.WriteMsg("Entrance returned was null");
+                Console.WriteLine("Entrance returned was null");
                 Environment.Exit(1);
             }
 
@@ -50,7 +52,7 @@ namespace Cave
             string endMsg = (hero.GetStatus() == Status.WIN) ? "Congratulations, Cave Hero!" : "Too bad, you lose!";
 
             Thread.Sleep(1000);
-            IOBuffer.WriteMsg(endMsg);
+            Game.IO.WriteMsg(endMsg);
             Thread.Sleep(1000);
         }
     }

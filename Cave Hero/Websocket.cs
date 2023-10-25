@@ -35,15 +35,20 @@ namespace Server
             var buffer = new byte[1024];
             
             _app.Map(
-                "/ws",
+                "/",
                 async context =>
                 {
                     if (context.WebSockets.IsWebSocketRequest)
                     {
                         using var ws = await context.WebSockets.AcceptWebSocketAsync();
+                        IOBuffer io = new IOBuffer();
+
+                        Thread gameThread = new(() => new Cave.Game().Start(io));
+                        gameThread.Start();
+
                         while (true)
                         {
-                            Message nOutput = IOBuffer.NextOutput();
+                            Message nOutput = io.NextOutput();
                             string message = JsonSerializer.Serialize(nOutput);
 
                             var bytes = Encoding.UTF8.GetBytes(message);
@@ -70,7 +75,7 @@ namespace Server
                                 var reply = await ws.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
                                 string rec = Encoding.UTF8.GetString(buffer, 0, reply.Count);
                                 Message msg = JsonSerializer.Deserialize<Message>(rec);
-                                IOBuffer.WriteInput(msg);
+                                io.WriteInput(msg);
                                 Thread.Sleep(500);
                             }
                         }

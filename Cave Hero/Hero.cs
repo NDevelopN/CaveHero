@@ -45,11 +45,11 @@ namespace Cave
                 }
             }
 
-            IOBuffer.WriteOption("Potential Targets", options);
+            Game.IO.WriteOption("Potential Targets", options);
 
             while (true)
             {
-                Message selection = IOBuffer.NextInput();
+                Message selection = Game.IO.NextInput();
                 string text = selection.Text;
 
                 foreach (Creature target in enemies)
@@ -60,7 +60,7 @@ namespace Cave
                         return;
                     }
                 }
-                IOBuffer.WriteMsg("Invalid target '" + text + "'.");
+                Game.IO.WriteMsg("Invalid target '" + text + "'.");
                 return;
             }
         }
@@ -72,7 +72,7 @@ namespace Cave
             {
                 if (Hp <= 5)
                 {
-                    IOBuffer.WriteMsg("Health is low, using Potion.");
+                    Game.IO.WriteMsg("Health is low, using Potion.");
                     UseItem("Potion");
                 }
             }

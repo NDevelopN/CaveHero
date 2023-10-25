@@ -1,5 +1,3 @@
-using Server;
-
 namespace Cave
 {
     public class Creature
@@ -22,8 +20,7 @@ namespace Cave
             Spd = spd;
 
             Status = Status.OK;
-            Items = new();
-            Target = null;
+            Items = new(); Target = null;
         }
 
         public Status GetStatus()
@@ -95,14 +92,14 @@ namespace Cave
                 return;
             }
 
-            IOBuffer.WriteMsg(Name + " attacks " + Target.GetName());
+            Game.IO.WriteMsg(Name + " attacks " + Target.GetName());
             Target.Damage(GetAtk());
             //TODO
         }
 
         public virtual void Damage(int val)
         {
-            IOBuffer.WriteMsg(Name + " is hit for " + val + "dmg.");
+            Game.IO.WriteMsg(Name + " is hit for " + val + "dmg.");
             ChangeHP(-val);
         }
 
@@ -161,14 +158,14 @@ namespace Cave
             }
             else
             {
-                IOBuffer.WriteMsg(Name + " now has " + Hp + "hp remaining.");
+                Game.IO.WriteMsg(Name + " now has " + Hp + "hp remaining.");
             }
         }
 
         protected virtual void Die()
         {
             Status = Status.DEFEATED;
-            IOBuffer.WriteMsg(Name + " has been defeated!");
+            Game.IO.WriteMsg(Name + " has been defeated!");
         }
     }
 }

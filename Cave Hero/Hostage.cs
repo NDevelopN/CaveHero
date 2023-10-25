@@ -27,14 +27,14 @@ namespace Cave
         {
             if (_rescued)
             {
-                IOBuffer.WriteMsg("This is where you found: " + _hostage.GetName());
+                Game.IO.WriteMsg("This is where you found: " + _hostage.GetName());
                 return;
             }
 
             //TODO check for party space, etc
             Hero hero = (Hero)party[0];
             hero.Join(_hostage);
-            IOBuffer.WriteMsg(_hostage.GetName() + " joins the party!");
+            Game.IO.WriteMsg(_hostage.GetName() + " joins the party!");
             _rescued = true;
         }
     }

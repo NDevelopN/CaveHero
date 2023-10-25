@@ -48,7 +48,7 @@ namespace Cave
         {
             if (_monsters.Count == 0)
             {
-                IOBuffer.WriteMsg("What a relief! No monsters here.");
+                Game.IO.WriteMsg("What a relief! No monsters here.");
                 return;
             }
 
@@ -69,7 +69,7 @@ namespace Cave
 
         protected void Fight(List<Creature> party)
         {
-            IOBuffer.WriteMsg("There are monsters, here. It's time to fight!");
+            Game.IO.WriteMsg("There are monsters, here. It's time to fight!");
             Initiative.Clear();
             Initiative.AddToInitiative(party);
             Initiative.AddToInitiative(_monsters);
@@ -94,15 +94,15 @@ namespace Cave
 
             if (party[0].GetStatus() != Status.OK)
             {
-                IOBuffer.WriteMsg("You fall in battle, another victim of the Cave.");
+                Game.IO.WriteMsg("You fall in battle, another victim of the Cave.");
             }
             else
             {
-                IOBuffer.WriteMsg("You won the fight, well done!");
-                IOBuffer.WriteMsg("State of your party: ");
+                Game.IO.WriteMsg("You won the fight, well done!");
+                Game.IO.WriteMsg("State of your party: ");
                 foreach (Creature member in party)
                 {
-                    IOBuffer.WriteMsg(member.GetName() + ": " + member.GetHP());
+                    Game.IO.WriteMsg(member.GetName() + ": " + member.GetHP());
                 }
                 _fought = true;
             }
@@ -124,12 +124,12 @@ namespace Cave
 
         protected void Aftermath()
         {
-            IOBuffer.WriteMsg("You won a battle here against:");
+            Game.IO.WriteMsg("You won a battle here against:");
             foreach (Creature monster in _monsters)
             {
-                IOBuffer.WriteMsg(monster.GetName());
+                Game.IO.WriteMsg(monster.GetName());
             }
-            IOBuffer.WriteMsg("Their bodies lay here still, growing cold.");
+            Game.IO.WriteMsg("Their bodies lay here still, growing cold.");
             //TODO
         }
     }

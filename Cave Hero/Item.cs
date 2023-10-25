@@ -41,7 +41,7 @@ namespace Cave
                 return Use();
             }
 
-            IOBuffer.WriteMsg("You can't target a creature with " + Name);
+            Game.IO.WriteMsg("You can't target a creature with " + Name);
             return false;
         }
 

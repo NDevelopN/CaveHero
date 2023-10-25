@@ -173,7 +173,7 @@ namespace Cave
                 mapString += "\n";
             }
 
-            Server.IOBuffer.WriteMsg(mapString);
+            Game.IO.WriteMsg(mapString);
         }
 
         protected Coord SelectEntrance()

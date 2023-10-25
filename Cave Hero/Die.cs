@@ -52,14 +52,14 @@ namespace Cave
                 int result = rnd.Next(1, _sides + 1);
                 if (print)
                 {
-                    IOBuffer.WriteMsg("Roll" + (i+1) + ": [" + result + "/" + _sides + "]");
+                    Game.IO.WriteMsg("Roll" + (i+1) + ": [" + result + "/" + _sides + "]");
                 }
                 total += result;
             }
 
             if (print)
             {
-                IOBuffer.WriteMsg("Total = " + total);
+                Game.IO.WriteMsg("Total = " + total);
             }
 
             return total;
