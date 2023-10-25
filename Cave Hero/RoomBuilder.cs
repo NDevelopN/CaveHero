@@ -1,20 +1,23 @@
+using Server;
+
 namespace Cave
 {
     public class RoomBuilder
     {
-
         private Dictionary<string, FeatureChance> chances;
 
         private FeatureChance trapChance = new(50, 50);
-        private FeatureChance combatChance = new(50, 70, 10,
-                new List<Type>(),
-                new List<Type> { typeof(Trap) });
-        private FeatureChance treasureChance = new(25, 25, 20,
-                new List<Type>(),
-                new List<Type> { typeof(Combat), typeof(Trap) });
-        private FeatureChance hostageChance = new FeatureChance(10, 100, 20,
-                new List<Type> { typeof(Combat) },
-                new List<Type> { typeof(Trap), typeof(Treasure) });
+        private FeatureChance combatChance =
+            new(50, 70, 10, new List<Type>(), new List<Type> { typeof(Trap) });
+        private FeatureChance treasureChance =
+            new(25, 25, 20, new List<Type>(), new List<Type> { typeof(Combat), typeof(Trap) });
+        private FeatureChance hostageChance = new FeatureChance(
+            10,
+            100,
+            20,
+            new List<Type> { typeof(Combat) },
+            new List<Type> { typeof(Trap), typeof(Treasure) }
+        );
 
         private double _maxPow = 40;
 
@@ -70,7 +73,6 @@ namespace Cave
                 }
 
                 fc.Value.IncreaseRoomCount();
-
             }
             return room;
         }
@@ -103,9 +105,8 @@ namespace Cave
             //TODO
             List<Item> haul = new() { new Potion(6, 1, 1) };
             return new Treasure(haul);
-
         }
-        
+
         protected Hostage CreateHostage()
         {
             //TODO

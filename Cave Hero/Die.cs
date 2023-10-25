@@ -1,3 +1,5 @@
+using Server;
+
 namespace Cave
 {
     public class Die
@@ -50,14 +52,14 @@ namespace Cave
                 int result = rnd.Next(1, _sides + 1);
                 if (print)
                 {
-                    Console.Write("[" + result + "/" + _sides + "]");
+                    IOBuffer.WriteMsg("Roll" + (i+1) + ": [" + result + "/" + _sides + "]");
                 }
                 total += result;
             }
 
             if (print)
             {
-                Console.WriteLine(" = " + total);
+                IOBuffer.WriteMsg("Total = " + total);
             }
 
             return total;

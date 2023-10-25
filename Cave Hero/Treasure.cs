@@ -1,4 +1,7 @@
-namespace Cave {
+using Server;
+
+namespace Cave
+{
     public class Treasure : IFeature
     {
         private bool _found;
@@ -28,20 +31,23 @@ namespace Cave {
             }
         }
 
-        public string Mention() {
+        public string Mention()
+        {
             return "There is a treasure chest here.";
         }
 
         private void Reward(Hero hero)
         {
-            Console.WriteLine("You found a treasure chest! Contained within...");
-            if (_haul.Count == 0) {
-                Console.WriteLine("Nothing... bummer");
+            IOBuffer.WriteMsg("You found a treasure chest! Contained within...");
+            if (_haul.Count == 0)
+            {
+                IOBuffer.WriteMsg("Nothing... bummer");
                 return;
             }
 
-            foreach (Item item in _haul) {
-                Console.WriteLine(item.ToString());
+            foreach (Item item in _haul)
+            {
+                IOBuffer.WriteMsg("" + item.ToString());
                 hero.AddItem(item);
             }
 
@@ -50,11 +56,12 @@ namespace Cave {
 
         private void Recall()
         {
-            Console.WriteLine("There was treasure here before. \nYou found:");
-            foreach (Item item in _haul) {
-                Console.WriteLine(item.GetName() + " (" + item.GetUses() + ")");
+            IOBuffer.WriteMsg("There was treasure here before. \nYou found:");
+            foreach (Item item in _haul)
+            {
+                IOBuffer.WriteMsg(item.GetName() + " (" + item.GetUses() + ")");
             }
-            Console.WriteLine("No, you don't get to grab it again.");
+            IOBuffer.WriteMsg("No, you don't get to grab it again.");
         }
     }
 }

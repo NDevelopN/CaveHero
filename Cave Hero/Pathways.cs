@@ -47,9 +47,9 @@ namespace Cave
             return null;
         }
 
-        public string PrintOut()
+        public List<string> GetOptions()
         {
-            string options = "Paths: ";
+            List<string> options = new();
 
             foreach (KeyValuePair<Dir, Room?> path in _paths)
             {
@@ -60,15 +60,13 @@ namespace Cave
 
                 if (path.Value.GetName() == "EXIT")
                 {
-                    options += "[ESCAPE] ";
+                    options.Add("ESCAPE");
                 }
                 else
                 {
-                    options += "[" + path.Key.ToString() + "] ";
+                    options.Add(path.Key.ToString());
                 }
             }
-
-            options += "\n";
 
             return options;
         }

@@ -1,3 +1,4 @@
+using Server;
 
 namespace Cave {
     public class Trap : IFeature
@@ -60,19 +61,18 @@ namespace Cave {
 
             if (tSpd >= dSpd)
             {
-                Console.WriteLine(" It triggers (" + dSpd + ") , but " + name + " (" + tSpd + ") manages to quickly evade it!");
+                IOBuffer.WriteMsg(" It triggers (" + dSpd + ") , but " + name + " (" + tSpd + ") manages to quickly evade it!");
             }
             else
             {
                 int damage = _dmg.Roll();
-                Console.WriteLine("A trap tiggers and catches " + name + " off guard, dealing " + damage + " damage !");
+                IOBuffer.WriteMsg("A trap tiggers and catches " + name + " off guard, dealing " + damage + " damage !");
                 target.Damage(damage);
             }
         }
 
         protected void Inert() {
-            Console.Write("There was a trap in this room, but it no longer functions.");
+            IOBuffer.WriteMsg("There was a trap in this room, but it no longer functions.");
         }
     }
-
 }

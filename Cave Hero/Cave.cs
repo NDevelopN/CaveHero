@@ -1,6 +1,7 @@
 namespace Cave
 {
-    public class Cave {
+    public class Cave
+    {
         protected struct Coord
         {
             public int X;
@@ -32,10 +33,7 @@ namespace Cave
         {
             _grid = new Dictionary<Coord, Room>();
             MaxX = x;
-            MaxY = y;
-
-            Size = size;
-
+            MaxY = y; Size = size;
             _builder = new RoomBuilder();
         }
 
@@ -157,22 +155,25 @@ namespace Cave
                 map[coord.Y] = row;
             }
 
-            Console.Write("  ");
-            for (int x = 0; x <= MaxX; x++) {
-                Console.Write(" " + x + " ");
+            string mapString = "   ";
+            for (int x = 0; x <= MaxX; x++)
+            {
+                mapString += " " + x + " ";
             }
-            Console.WriteLine();
+            mapString += "\n";
 
             for (int y = MaxY; y >= 0; y--)
             {
                 row = map[y];
-                Console.Write(y + "|");
+                mapString += y + "|";
                 for (int x = 0; x <= MaxX; x++)
                 {
-                    Console.Write(row[x]);
+                    mapString += row[x];
                 }
-                Console.WriteLine();
+                mapString += "\n";
             }
+
+            Server.IOBuffer.WriteMsg(mapString);
         }
 
         protected Coord SelectEntrance()

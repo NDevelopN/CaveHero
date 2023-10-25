@@ -1,3 +1,5 @@
+using Server;
+
 namespace Cave
 {
     public class Room
@@ -40,7 +42,9 @@ namespace Cave
             }
             else
             {
-                Console.WriteLine("Added " + room.GetName() + " to " + dir.ToString() + " of " + _name);
+                Console.WriteLine(
+                    "Added " + room.GetName() + " to " + dir.ToString() + " of " + _name
+                );
             }
         }
 
@@ -53,18 +57,14 @@ namespace Cave
         {
             try
             {
-                Console.WriteLine("You are in " + _name);
-                Console.WriteLine("Where to next?");
+                IOBuffer.WriteMsg("You are in " + _name);
+
+                List<string> options = Paths.GetOptions();
                 while (true)
                 {
-                    //TODO universal text entry
-                    Console.Write(Paths.PrintOut());
-                    string? dir = Console.ReadLine();
-                    if (dir == null)
-                    {
-                        Console.WriteLine("No input received.");
-                        continue;
-                    }
+                    IOBuffer.WriteOption("Where to next?", options);
+                    Message reply = IOBuffer.NextInput();
+                    string dir = reply.Text;
 
                     dir = dir.ToUpper();
 
@@ -94,8 +94,10 @@ namespace Cave
 
         public string GetTopFeature()
         {
-            if (_name == "Entrance") return "E";
-            if (_name == "EXIT") return "e";
+            if (_name == "Entrance")
+                return "E";
+            if (_name == "EXIT")
+                return "e";
 
             int top = 0;
             foreach (IFeature feature in Features)
@@ -135,10 +137,10 @@ namespace Cave
 
         public void Enter(Hero hero)
         {
-            Console.WriteLine("Entering " + _name);
+            IOBuffer.WriteMsg("Entering " + _name);
             foreach (IFeature feature in Features)
             {
-                Console.WriteLine("Feature: " + feature.GetType().Name);
+                IOBuffer.WriteMsg("Feature: " + feature.GetType().Name);
                 feature.Trigger(hero.GetParty());
                 if (hero.GetStatus() == Status.DEFEATED)
                 {

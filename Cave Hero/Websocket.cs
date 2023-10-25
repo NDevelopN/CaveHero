@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.WebSockets;
 using System.Text;
+using System.Text.Json;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace Server
@@ -29,38 +30,57 @@ namespace Server
             return _instance;
         }
 
-
         public async Task Start()
         {
-            _app.Map("/ws", async context =>
-            {
-                if (context.WebSockets.IsWebSocketRequest)
+            var buffer = new byte[1024];
+            
+            _app.Map(
+                "/ws",
+                async context =>
                 {
-                    using var ws = await context.WebSockets.AcceptWebSocketAsync();
-                    while (true)
+                    if (context.WebSockets.IsWebSocketRequest)
                     {
-                        var message = "The current time is : " + DateTime.Now.ToString("HH:mm:ss");
-                        var bytes = Encoding.UTF8.GetBytes(message);
-                        var arraySegment = new ArraySegment<byte>(bytes, 0, bytes.Length);
-                        if (ws.State == WebSocketState.Open)
+                        using var ws = await context.WebSockets.AcceptWebSocketAsync();
+                        while (true)
                         {
-                            await ws.SendAsync(arraySegment,
-                            WebSocketMessageType.Text,
-                            true,
-                            CancellationToken.None);
+                            Message nOutput = IOBuffer.NextOutput();
+                            string message = JsonSerializer.Serialize(nOutput);
+
+                            var bytes = Encoding.UTF8.GetBytes(message);
+                            var arraySegment = new ArraySegment<byte>(bytes, 0, bytes.Length);
+                            if (ws.State == WebSocketState.Open)
+                            {
+                                await ws.SendAsync(
+                                    arraySegment,
+                                    WebSocketMessageType.Text,
+                                    true,
+                                    CancellationToken.None
+                                );
+                            }
+                            else if (
+                                ws.State == WebSocketState.Closed
+                                || ws.State == WebSocketState.Aborted
+                            )
+                            {
+                                break;
+                            }
+
+                            if (nOutput.MType == MsgType.Option)
+                            {
+                                var reply = await ws.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                                string rec = Encoding.UTF8.GetString(buffer, 0, reply.Count);
+                                Message msg = JsonSerializer.Deserialize<Message>(rec);
+                                IOBuffer.WriteInput(msg);
+                                Thread.Sleep(500);
+                            }
                         }
-                        else if (ws.State == WebSocketState.Closed || ws.State == WebSocketState.Aborted)
-                        {
-                            break;
-                        }
-                        Thread.Sleep(1000);
+                    }
+                    else
+                    {
+                        context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     }
                 }
-                else
-                {
-                    context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                }
-            });
+            );
 
             await _app.RunAsync();
         }

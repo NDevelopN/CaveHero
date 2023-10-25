@@ -1,3 +1,5 @@
+using Server;
+
 namespace Cave
 {
     public class Escape : IFeature 
@@ -11,16 +13,16 @@ namespace Cave
         public void Trigger(List<Creature> party)
         {
             //TODO remove
-            Console.WriteLine(Mention());
+            IOBuffer.WriteMsg(Mention());
             Hero hero = (Hero)party[0];
             if (hero.CheckSuccess("Sibling"))
             {
-                Console.WriteLine("You have succeeded and saved your sibling!");
+                IOBuffer.WriteMsg("You have succeeded and saved your sibling!");
                 hero.SetStatus(Status.WIN);
             }
             else
             {
-                Console.WriteLine("There's no going back now, your Sibling is dead for sure...");
+                IOBuffer.WriteMsg("There's no going back now, your Sibling is dead for sure...");
                 hero.SetStatus(Status.DEFEATED);
             }
         }

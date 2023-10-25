@@ -1,3 +1,5 @@
+using Server;
+
 namespace Cave
 {
     public class Hero : Creature
@@ -6,8 +8,8 @@ namespace Cave
 
         private List<Creature> _party;
 
-        public Hero(string name, int hp, Die atk, Die spd, int maxCompanions) :
-                    base(name, hp, atk, spd)
+        public Hero(string name, int hp, Die atk, Die spd, int maxCompanions)
+            : base(name, hp, atk, spd)
         {
             AddItem(new Potion(6, 1, 1));
             _party = new();
@@ -33,31 +35,33 @@ namespace Cave
 
         public override void DoCombat(List<Creature> allies, List<Creature> enemies)
         {
-            Console.WriteLine("Potential Targets");
+            List<string> options = new();
+
             foreach (Creature target in enemies)
             {
                 if (target.GetStatus() == Status.OK)
                 {
-                    Console.Write("[" + target.GetName() + "]");
+                    options.Add(target.GetName());
                 }
             }
 
+            IOBuffer.WriteOption("Potential Targets", options);
+
             while (true)
             {
-                string? selection = Console.ReadLine();
-                if (selection != null)
+                Message selection = IOBuffer.NextInput();
+                string text = selection.Text;
+
+                foreach (Creature target in enemies)
                 {
-                    foreach (Creature target in enemies)
+                    if (target.GetName() == text)
                     {
-                        if (target.GetName() == selection)
-                        {
-                            target.Damage(GetAtk());
-                            return;
-                        }
+                        target.Damage(GetAtk());
+                        return;
                     }
                 }
-
-                Console.WriteLine("Invalid target '" + selection + "'.");
+                IOBuffer.WriteMsg("Invalid target '" + text + "'.");
+                return;
             }
         }
 
@@ -68,7 +72,7 @@ namespace Cave
             {
                 if (Hp <= 5)
                 {
-                    Console.WriteLine("Health is low, using Potion.");
+                    IOBuffer.WriteMsg("Health is low, using Potion.");
                     UseItem("Potion");
                 }
             }

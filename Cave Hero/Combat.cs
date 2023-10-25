@@ -1,4 +1,5 @@
 using System.Collections;
+using Server;
 
 namespace Cave
 {
@@ -47,7 +48,7 @@ namespace Cave
         {
             if (_monsters.Count == 0)
             {
-                Console.WriteLine("What a relief! No monsters here.");
+                IOBuffer.WriteMsg("What a relief! No monsters here.");
                 return;
             }
 
@@ -68,7 +69,7 @@ namespace Cave
 
         protected void Fight(List<Creature> party)
         {
-            Console.WriteLine("There are monsters, here. It's time to fight!");
+            IOBuffer.WriteMsg("There are monsters, here. It's time to fight!");
             Initiative.Clear();
             Initiative.AddToInitiative(party);
             Initiative.AddToInitiative(_monsters);
@@ -93,15 +94,15 @@ namespace Cave
 
             if (party[0].GetStatus() != Status.OK)
             {
-                Console.WriteLine("You fall in battle, another victim of the Cave.");
+                IOBuffer.WriteMsg("You fall in battle, another victim of the Cave.");
             }
             else
             {
-                Console.WriteLine("You won the fight, well done!");
-                Console.WriteLine("State of your party: ");
+                IOBuffer.WriteMsg("You won the fight, well done!");
+                IOBuffer.WriteMsg("State of your party: ");
                 foreach (Creature member in party)
                 {
-                    Console.WriteLine(member.GetName() + ": " + member.GetHP());
+                    IOBuffer.WriteMsg(member.GetName() + ": " + member.GetHP());
                 }
                 _fought = true;
             }
@@ -123,12 +124,12 @@ namespace Cave
 
         protected void Aftermath()
         {
-            Console.WriteLine("You won a battle here against:");
+            IOBuffer.WriteMsg("You won a battle here against:");
             foreach (Creature monster in _monsters)
             {
-                Console.WriteLine(monster.GetName());
+                IOBuffer.WriteMsg(monster.GetName());
             }
-            Console.WriteLine("Their bodies lay here still, growing cold.");
+            IOBuffer.WriteMsg("Their bodies lay here still, growing cold.");
             //TODO
         }
     }

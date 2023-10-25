@@ -1,3 +1,5 @@
+using Server;
+
 namespace Cave
 {
     public abstract class Item
@@ -39,7 +41,7 @@ namespace Cave
                 return Use();
             }
 
-            Console.Write("You can't target a creature with " + Name);
+            IOBuffer.WriteMsg("You can't target a creature with " + Name);
             return false;
         }
 
