@@ -76,8 +76,9 @@ namespace Server
                                 string rec = Encoding.UTF8.GetString(buffer, 0, reply.Count);
                                 Message msg = JsonSerializer.Deserialize<Message>(rec);
                                 io.WriteInput(msg);
-                                Thread.Sleep(500);
                             }
+
+                            Thread.Sleep(250);
                         }
                     }
                     else
