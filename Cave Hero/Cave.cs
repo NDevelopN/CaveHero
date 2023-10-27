@@ -2,64 +2,93 @@ namespace Cave
 {
     public class Cave
     {
-        protected struct Coord
-        {
-            public int X;
-            public int Y;
+        private RoomFactory _rFactory;
 
-            public Coord(int x, int y)
-            {
-                X = x;
-                Y = y;
-            }
+        private Dictionary<string, RoomTypeVals> _rtv;
 
-            public override string ToString()
-            {
-                return "(" + X + "," + Y + ")";
-            }
-        }
+        private double _trapPC = .5;
+        private double _combatPC = .25;
+        private double _treasurePC = .15;
+        private double _hostagePC = 1;
 
-        private RoomBuilder _builder;
+        private int _trapMax;
+        private int _combatMax;
+        private int _treasureMax;
+        private int _hostageMax = 1;
+
+        private int _roomCount = 0;
+        private int _tarRoomCount;
+
+        private int _maxX;
+        private int _maxY;
 
         private Dictionary<Coord, Room> _grid;
         private Room? _entrance;
 
-        private int _PATHMOD = 10;
-
-        protected int MaxX, MaxY;
-        protected int Size;
-
-        public Cave(int x, int y, int size)
+        public Cave(int x, int y, int trc)
         {
-            _grid = new Dictionary<Coord, Room>();
-            MaxX = x;
-            MaxY = y; Size = size;
-            _builder = new RoomBuilder();
+            _maxX = x;
+            _maxY = y;
+            _tarRoomCount = trc;
+
+            _trapMax = (int)(trc * _trapPC);
+            _combatMax = (int)(trc * _combatPC);
+            _treasureMax = (int)(trc * _treasurePC);
+
+            _rtv = new()
+            {
+                { "Trap", new RoomTypeVals(_trapPC, 0, _trapMax) },
+                { "Combat", new RoomTypeVals(_combatPC, 0, _combatMax) },
+                { "Treasure", new RoomTypeVals(_treasurePC, 0, _treasureMax) },
+                { "Hostage", new RoomTypeVals(_hostagePC, 0, _hostageMax) }
+            };
+
+            _grid = new();
+
+            _rFactory = new();
         }
 
         public Room? Generate()
         {
             Stack<Coord> stack = new();
+            stack.Push(SelectEntrance());
 
-            int roomCount = 0;
-            Coord curLoc = SelectEntrance();
+            ExpandRoom(stack);
 
-            stack.Push(curLoc);
+            while (_roomCount < _tarRoomCount)
+            {
+                Random rnd = new();
+                Coord nLoc;
+                do
+                {
+                    nLoc = new(rnd.Next(0, _maxX), rnd.Next(0, _maxY));
+                } while (!_grid.ContainsKey(nLoc));
 
+                stack.Push(nLoc);
+
+                ExpandRoom(stack);
+            }
+
+            CreateMap();
+
+            return _entrance;
+        }
+
+        private void ExpandRoom(Stack<Coord> stack)
+        {
             while (stack.Count > 0)
             {
-                curLoc = stack.Pop();
+                Coord curLoc = stack.Pop();
 
                 Room room = _grid[curLoc];
                 int pCount = room.GetPCount();
 
                 //While all 4 paths have not been accounted for, and while there are more rooms to add
-                while (pCount < 4 && roomCount < Size)
+                while (pCount < 4 && _roomCount < _tarRoomCount)
                 {
-
                     Random rnd = new();
                     int res = rnd.Next(0, 100);
-                    int rChance = RoomChance(room.GetPCount(), roomCount);
+                    int rChance = RoomChance(room.GetPCount());
                     if (res > rChance)
                     {
                         pCount++;
@@ -73,18 +102,18 @@ namespace Cave
                         continue;
                     }
 
+                    pCount++;
                     Room nRoom;
 
                     if (_grid.ContainsKey(nextLoc))
                     {
                         nRoom = _grid[nextLoc];
-                        pCount++;
                     }
                     else
                     {
-                        roomCount++;
+                        _roomCount++;
 
-                        nRoom = _builder.CreateRoom("(" + nextLoc.X + ", " + nextLoc.Y + ")");
+                        nRoom = NextRoom();
                         _grid.Add(nextLoc, nRoom);
 
                         stack.Push(nextLoc);
@@ -121,64 +150,58 @@ namespace Cave
                     continue;
                 }
             }
-
-            if (roomCount < Size)
-            {
-                Console.WriteLine("Did not generate all intended rooms: " + roomCount + "/" + Size);
-            }
-
-            CreateMap();
-
-            return _entrance;
         }
 
-        private void CreateMap()
+        private Room NextRoom()
         {
-            List<List<string>> map = new();
-            List<string> row = new();
-
-            for (int i = 0; i <= MaxY; i++)
+            RoomTypeVals htv = _rtv["Hostage"];
+            if (_roomCount == _tarRoomCount - 1 && htv.FCount < htv.Max)
             {
-                row = new();
-                for (int j = 0; j <= MaxX; j++)
+                htv.FCount++;
+                _rtv["Hostage"] = htv;
+                return _rFactory.Create("Hostage");
+            }
+
+            foreach (KeyValuePair<string, RoomTypeVals> rtv in _rtv)
+            {
+                RoomTypeVals ctv = rtv.Value;
+                if (CheckChance(ctv))
                 {
-                    row.Add("[/]");
+                    ctv.FCount++;
+                    _rtv[rtv.Key] = ctv;
+
+                    return _rFactory.Create(rtv.Key);
                 }
-                map.Add(row);
             }
 
-            foreach (KeyValuePair<Coord, Room> cell in _grid)
-            {
-                Coord coord = cell.Key;
-                row = map[coord.Y];
-                row[coord.X] = "[" + cell.Value.GetTopFeature() + "]";
-                map[coord.Y] = row;
-            }
-
-            string mapString = "   ";
-            for (int x = 0; x <= MaxX; x++)
-            {
-                mapString += " " + x + " ";
-            }
-            mapString += "\n";
-
-            for (int y = MaxY; y >= 0; y--)
-            {
-                row = map[y];
-                mapString += y + "|";
-                for (int x = 0; x <= MaxX; x++)
-                {
-                    mapString += row[x];
-                }
-                mapString += "\n";
-            }
-
-            Game.IO.WriteMsg(mapString);
+            return _rFactory.Create("Empty");
         }
 
-        protected Coord SelectEntrance()
+        private bool CheckChance(RoomTypeVals rtv)
         {
-            int x, y;
+            if (rtv.FCount >= rtv.Max)
+            {
+                return false;
+            }
+            else if (rtv.Percent == 1)
+            {
+                return true;
+            }
+
+            int floor = (int)(((rtv.Max * rtv.FCount) / _roomCount) * 10);
+            int nr = new Random().Next(floor, 100);
+            if (nr > (int)(rtv.Percent * 100))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private Coord SelectEntrance()
+        {
+            int x,
+                y;
             Coord entCoord;
 
             Random rnd = new();
@@ -187,39 +210,39 @@ namespace Cave
             {
                 case Dir.WEST:
                     x = 0;
-                    y = rnd.Next(0, MaxY + 1);
+                    y = rnd.Next(0, _maxY + 1);
                     entCoord = new Coord(x, y);
                     break;
                 case Dir.NORTH:
-                    x = rnd.Next(0, MaxX + 1);
+                    x = rnd.Next(0, _maxX + 1);
                     y = 0;
                     entCoord = new Coord(x, y);
                     break;
                 case Dir.EAST:
-                    x = MaxX;
-                    y = rnd.Next(0, MaxY + 1);
+                    x = _maxX;
+                    y = rnd.Next(0, _maxY + 1);
                     entCoord = new Coord(x, y);
                     break;
                 case Dir.SOUTH:
-                    x = rnd.Next(0, MaxX + 1);
-                    y = MaxY;
+                    x = rnd.Next(0, _maxX + 1);
+                    y = _maxY;
                     entCoord = new Coord(x, y);
                     break;
                 default:
                     Console.WriteLine("[ERROR] Invalid starting direction: " + dir);
                     x = 0;
-                    y = rnd.Next(0, MaxY + 1);
+                    y = rnd.Next(0, _maxY + 1);
                     entCoord = new Coord(x, y);
                     break;
             }
 
-            _entrance = _builder.CreateEntranceRoom(dir);
+            _entrance = _rFactory.CreateEntrance(dir);
             _grid.Add(entCoord, _entrance);
 
             return entCoord;
         }
 
-        protected Coord ContinuePath(Coord curLoc)
+        private Coord ContinuePath(Coord curLoc)
         {
             Random rnd = new();
 
@@ -238,7 +261,7 @@ namespace Cave
                     break;
                 case 1:
                     //North
-                    if (curLoc.Y >= MaxY)
+                    if (curLoc.Y >= _maxY)
                     {
                         return curLoc;
                     }
@@ -246,7 +269,7 @@ namespace Cave
                     break;
                 case 2:
                     //East
-                    if (curLoc.X >= MaxX)
+                    if (curLoc.X >= _maxX)
                     {
                         return curLoc;
                     }
@@ -261,7 +284,7 @@ namespace Cave
                     nextCoord = new Coord(curLoc.X, curLoc.Y - 1);
                     break;
                 default:
-                    Console.WriteLine("Invalid direction: " + res);
+                    Console.WriteLine("[ERROR] Invalid direction: " + res);
                     nextCoord = curLoc;
                     break;
             }
@@ -272,18 +295,62 @@ namespace Cave
         /**
          *  Generate a probability of creating a new room given
          *      -The number of existing paths from the current room
-         *      -The percentage of rooms yet to be created 
+         *      -The percentage of rooms yet to be created
          *  The result should be higher chances for early rooms and rooms with fewer paths
-        **/
-        protected int RoomChance(int pCount, int roomCount)
+         **/
+        private int RoomChance(int pCount)
         {
             int chance = 70;
-            int pChance = _PATHMOD * pCount;
-            int rChance = (int)(decimal.Divide(Size - roomCount, Size) * 50);
+            int pChance = 10 * pCount;
+            int rChance = (int)(decimal.Divide(_tarRoomCount - _roomCount, _tarRoomCount) * 50);
 
             int total = chance - pChance + rChance;
 
             return total;
+        }
+
+        private void CreateMap()
+        {
+            List<List<string>> map = new();
+            List<string> row = new();
+
+            for (int i = 0; i <= _maxY; i++)
+            {
+                row = new();
+                for (int j = 0; j <= _maxX; j++)
+                {
+                    row.Add("[/]");
+                }
+                map.Add(row);
+            }
+
+            foreach (KeyValuePair<Coord, Room> cell in _grid)
+            {
+                Coord coord = cell.Key;
+                row = map[coord.Y];
+                row[coord.X] = "[" + cell.Value.GetTopFeature() + "]";
+                map[coord.Y] = row;
+            }
+
+            string mapString = "   ";
+            for (int x = 0; x <= _maxX; x++)
+            {
+                mapString += " " + x + " ";
+            }
+            mapString += "\n";
+
+            for (int y = _maxY; y >= 0; y--)
+            {
+                row = map[y];
+                mapString += y + "|";
+                for (int x = 0; x <= _maxX; x++)
+                {
+                    mapString += row[x];
+                }
+                mapString += "\n";
+            }
+
+            Game.IO.WriteMsg(mapString);
         }
     }
 }

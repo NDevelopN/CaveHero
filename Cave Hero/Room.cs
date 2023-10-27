@@ -34,16 +34,7 @@ namespace Cave
 
         public void AddPath(Dir dir, Room room)
         {
-            if (!Paths.SetPath(dir, room))
-            {
-                Console.WriteLine("Attempted to create room where there was already a path.");
-            }
-            else
-            {
-                Console.WriteLine(
-                    "Added " + room.GetName() + " to " + dir.ToString() + " of " + _name
-                );
-            }
+            Paths.SetPath(dir, room);
         }
 
         public int GetPCount()
