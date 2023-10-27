@@ -1,10 +1,16 @@
-using Server;
+using CaveHero.Server;
 
-namespace Cave
+using CaveHero.CHCreature;
+using CaveHero.CHCave;
+using CaveHero.CHDie;
+using CaveHero.CHRoom;
+
+
+namespace CaveHero
 {
     public class Game 
     {
-        [ThreadStatic] public static Server.IOBuffer IO;
+        [ThreadStatic] public static IOBuffer IO;
 
         private Hero CreateHero()
         {

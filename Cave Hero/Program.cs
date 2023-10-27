@@ -1,4 +1,3 @@
-using Cave;
-using Server;
+using CaveHero.Server;
 
 await Websocket.GetInstance().Start();
