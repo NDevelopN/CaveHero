@@ -10,7 +10,7 @@ namespace CaveHero
 {
     public class Game 
     {
-        [ThreadStatic] public static IOBuffer IO;
+        [ThreadStatic] public static IOBuffer IO = new();
 
         private Hero CreateHero()
         {
