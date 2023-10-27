@@ -3,7 +3,7 @@ namespace Cave
     public class Potion : Item
     {
         private Die _die;
-        private int _maxUses = 3;
+        private int _maxUses = 7;
 
         public Potion(int size, int count, int uses) : base("Potion", uses)
         {

@@ -47,7 +47,7 @@ namespace Cave
 
             foreach (Item item in _haul)
             {
-                Game.IO.WriteMsg("" + item.ToString());
+                Game.IO.WriteMsg("" + item.GetName());
                 hero.AddItem(item);
             }
 

@@ -11,15 +11,15 @@ namespace Cave
         public Hero(string name, int hp, Die atk, Die spd, int maxCompanions)
             : base(name, hp, atk, spd)
         {
-            AddItem(new Potion(6, 1, 1));
+            AddItem(new Potion(4, 2, 3));
             _party = new();
             _maxCompanions = maxCompanions;
             _party = new List<Creature> { this };
         }
 
-        public void UseItem(string name)
+        public bool UseItem(string name)
         {
-            UseItem(name, this);
+            return UseItem(name, this);
         }
 
         public bool Join(Creature companion)
@@ -72,8 +72,10 @@ namespace Cave
             {
                 if (Hp <= 5)
                 {
-                    Game.IO.WriteMsg("Health is low, using Potion.");
-                    UseItem("Potion");
+                    Game.IO.WriteMsg("Health is low, time to use a Potion.");
+                    if (!UseItem("Potion")) {
+                        Game.IO.WriteMsg("Oh no! There are not Potions left!");
+                    };
                 }
             }
         }

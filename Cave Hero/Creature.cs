@@ -141,6 +141,7 @@ namespace Cave
             {
                 if (Items[name].Use(target))
                 {
+                    Game.IO.WriteMsg(name + " is all used up.");
                     Items.Remove(name);
                 }
                 return true;
