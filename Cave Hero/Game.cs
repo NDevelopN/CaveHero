@@ -11,8 +11,8 @@ namespace Cave
             HeroBuilder builder = new()
             {
                 Name = "Hero",
-                HP = 12,
-                Atk = new Die(3, 2),
+                HP = 20,
+                Atk = new Die(6, 2),
                 Spd = new Die(3, 3),
                 MaxCompanions = 3
             };
