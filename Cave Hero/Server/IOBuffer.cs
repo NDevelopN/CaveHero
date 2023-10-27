@@ -22,7 +22,7 @@ namespace CaveHero.Server
 
         public void WriteHeading(string header)
         {
-            Message msg = new Message(MsgType.Heading, header, null);
+            Message msg = new Message(MsgType.Heading, header, new());
             _output.Add(msg);
         }
 
@@ -33,7 +33,7 @@ namespace CaveHero.Server
 
         public void WriteMsg(string text)
         {
-            Message msg = new Message(MsgType.Message, text, new List<string>());
+            Message msg = new Message(MsgType.Message, text, new());
             _output.Add(msg);
         }
 
