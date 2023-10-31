@@ -10,7 +10,7 @@ namespace CaveHero
 {
     public class Game 
     {
-        [ThreadStatic] public static IOBuffer IO = new();
+        [ThreadStatic] public static IOBuffer IO;
 
         private Hero CreateHero()
         {
@@ -26,7 +26,7 @@ namespace CaveHero
             return builder.Build();
         }
 
-        public void Start(IOBuffer io)
+        public void Start(IOBuffer io, CancellationToken token)
         {
             IO = io;
             Hero hero = CreateHero();
@@ -40,12 +40,15 @@ namespace CaveHero
             if (ent == null)
             {
                 Console.WriteLine("Entrance returned was null");
-                Environment.Exit(1);
+                return;
             }
 
             Room? curRoom = ent;
             while (hero.GetStatus() != Status.DEFEATED && hero.GetStatus() != Status.WIN)
             {
+                if (token.IsCancellationRequested) {
+                    token.ThrowIfCancellationRequested();
+                }
                 curRoom = curRoom.ChoosePath();
                 if (curRoom == null)
                 {
@@ -53,13 +56,13 @@ namespace CaveHero
                 }
 
                 curRoom.Enter(hero);
-            }
+            } 
 
             string endMsg = (hero.GetStatus() == Status.WIN) ? "Congratulations, Cave Hero!" : "Too bad, you lose!";
 
             Thread.Sleep(1000);
-            Game.IO.WriteMsg(endMsg);
+            Game.IO.WriteEnd(endMsg);
             Thread.Sleep(1000);
-        }
+        } 
     }
 }

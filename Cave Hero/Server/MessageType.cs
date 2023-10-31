@@ -5,5 +5,6 @@ namespace CaveHero.Server
         Heading,
         Message,
         Option,
+        End,
     }
 }

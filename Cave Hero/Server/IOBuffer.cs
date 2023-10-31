@@ -4,8 +4,16 @@ namespace CaveHero.Server
 {
     public class IOBuffer
     {
-        private BlockingCollection<Message> _input = new();
-        private BlockingCollection<Message> _output = new();
+
+        private CancellationToken _token;
+        private BlockingCollection<Message> _input;
+        private BlockingCollection<Message> _output;
+
+        public IOBuffer(CancellationToken token) {
+            _token = token;
+            _input = new();
+            _output = new();
+        }
 
         public void WriteInput(Message input)
         {
@@ -14,7 +22,7 @@ namespace CaveHero.Server
 
         public Message NextInput()
         {
-            return _input.Take();
+            return _input.Take(_token);
         }
 
         ////////////////////////////////////////////////
@@ -42,9 +50,15 @@ namespace CaveHero.Server
             _output.Add(msg);
         }
 
+        public void WriteEnd(string text) {
+            Message msg = new Message(MsgType.End, text, new());
+            _output.Add(msg);
+        }
+
         public Message NextOutput()
         {
-            return _output.Take();
+            return _output.Take(_token);
         }
+
     }
 }

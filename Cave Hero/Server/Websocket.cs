@@ -3,9 +3,6 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
 
-using CaveHero;
-
-
 namespace CaveHero.Server
 {
     public class Websocket
@@ -40,15 +37,19 @@ namespace CaveHero.Server
                 "/",
                 async context =>
                 {
+                    CancellationTokenSource source = new();
+                    CancellationToken token = source.Token;
+                    try {
                     if (context.WebSockets.IsWebSocketRequest)
                     {
                         using var ws = await context.WebSockets.AcceptWebSocketAsync();
-                        IOBuffer io = new IOBuffer();
+                        IOBuffer io = new(token);
 
-                        Thread gameThread = new(() => new Game().Start(io));
-                        gameThread.Start();
+                        Task gameTask = new(() => new Game().Start(io, token));
+                        gameTask.Start();
 
-                        while (true)
+                        bool loop = true;
+                        while (loop)
                         {
                             Message nOutput = io.NextOutput();
                             string message = JsonSerializer.Serialize(nOutput);
@@ -61,7 +62,7 @@ namespace CaveHero.Server
                                     arraySegment,
                                     WebSocketMessageType.Text,
                                     true,
-                                    CancellationToken.None
+                                    token
                                 );
                             }
                             else if (
@@ -69,15 +70,29 @@ namespace CaveHero.Server
                                 || ws.State == WebSocketState.Aborted
                             )
                             {
+                                Console.WriteLine("Websocket : " + ws.State);
+                                loop = false;
                                 break;
                             }
 
-                            if (nOutput.MType == MsgType.Option)
-                            {
-                                var reply = await ws.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                            switch (nOutput.MType) {
+                            case MsgType.Option:
+                                var reply = await ws.ReceiveAsync(new ArraySegment<byte>(buffer), token);
+                                if (reply.MessageType == WebSocketMessageType.Close) {
+                                    Console.WriteLine("The client closed the connection.");
+                                    loop = false;
+                                    break;
+                                }
                                 string rec = Encoding.UTF8.GetString(buffer, 0, reply.Count);
                                 Message msg = JsonSerializer.Deserialize<Message>(rec);
                                 io.WriteInput(msg);
+                                break;
+                            case MsgType.End:
+                                loop = false;
+                                Thread.Sleep(5000);
+                                break;
+                            default:
+                                break;
                             }
 
                             Thread.Sleep(100);
@@ -87,6 +102,12 @@ namespace CaveHero.Server
                     {
                         context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     }
+                    } catch (Exception e) {
+                        Console.Error.WriteLine("Caught exception: " + e);
+                    }
+                    
+                    source.Cancel();
+                    return;
                 }
             );
 
