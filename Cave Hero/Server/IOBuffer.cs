@@ -14,7 +14,6 @@ namespace CaveHero.Server
 
         public Message NextInput()
         {
-            while (_input.Count == 0) { }
             return _input.Take();
         }
 
@@ -45,7 +44,6 @@ namespace CaveHero.Server
 
         public Message NextOutput()
         {
-            while (_output.Count == 0) { }
             return _output.Take();
         }
     }
